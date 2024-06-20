@@ -1,0 +1,33 @@
+spring:
+
+  application:
+    name: integracao_logistica
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    queue:
+      voto:
+        nome: votos
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/assembleia
+    username: postgres
+    password: 123456
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    root: INFO
+
+
