@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
+@Table(name = "associado")
 public class AssociadoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

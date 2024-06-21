@@ -5,6 +5,7 @@ import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
 import com.sicredi.assembleia.core.entity.PautaEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
+import com.sicredi.assembleia.core.exception.PautaJaTemUmaSessaoVotacaoException;
 import com.sicredi.assembleia.core.exception.SessaoNotFoundException;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoRepository;
 import com.sicredi.assembleia.core.service.pauta.PautaService;
@@ -14,6 +15,7 @@ import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,15 +36,18 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
 
     @Override
     public SessaoVotacaoResponse abrir(AberturaSessaoVotacaoRequest aberturaSessaoVotacaoRequest) {
+        logger.info("Iniciando processo de abertura da sessão de votação");
+
         PautaEntity pautaEntity = pautaService.findById(aberturaSessaoVotacaoRequest.getPautaId());
 
         SessaoVotacaoEntity sessaoVotacaoEntity = sessaoVotacaoMapper
                 .criarNovaSessao(pautaEntity, aberturaSessaoVotacaoRequest.getDuracaoMinutos());
 
-        SessaoVotacaoEntity sessaoVotacaoSaved = sessaoVotacaoRepository.save(sessaoVotacaoEntity);
+        SessaoVotacaoEntity sessaoVotacaoSaved = save(sessaoVotacaoEntity);
 
-        sessaoVotacaoCacheService.inserirVotoEmCache(sessaoVotacaoEntity);
+        sessaoVotacaoCacheService.inserirSessaoVotacaoEmCache(sessaoVotacaoEntity);
 
+        logger.info("Sessão de votação foi aberta com sucesso. sessaoId: {}", sessaoVotacaoSaved.getId());
         return sessaoVotacaoMapper.sessaoEntityToResponse(sessaoVotacaoSaved);
     }
 
@@ -63,16 +68,23 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
     @Override
     public SessaoVotacaoResponse findResponseById(Long id) {
         SessaoVotacaoEntity sessaoVotacaoEntity = findById(id);
+
         return sessaoVotacaoMapper.sessaoEntityToResponse(sessaoVotacaoEntity);
     }
 
     @Override
     public List<SessaoVotacaoEntity> findAllStatusAberto(){
+        logger.info("Consultando todas sessões abertas.");
         return sessaoVotacaoRepository.findAllByStatus(SessaoVotacaoEnum.ABERTA);
     }
 
     @Override
     public SessaoVotacaoEntity save (SessaoVotacaoEntity entity){
-        return sessaoVotacaoRepository.save(entity);
+        try {
+            return sessaoVotacaoRepository.save(entity);
+        }catch (DataIntegrityViolationException e){
+            logger.error(e.getMessage(), e);
+            throw new PautaJaTemUmaSessaoVotacaoException();
+        }
     }
 }

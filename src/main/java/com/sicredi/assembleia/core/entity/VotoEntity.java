@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
+@Table(name = "voto")
 public class VotoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

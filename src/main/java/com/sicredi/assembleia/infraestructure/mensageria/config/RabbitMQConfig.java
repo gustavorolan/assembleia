@@ -10,7 +10,10 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Value("${spring.rabbitmq.queue.voto.nome}")
-    private String orderQueue;
+    private String votoQueue;
+
+    @Value("${spring.rabbitmq.queue.voto.dlq}")
+    private String votoQueueDlq;
 
     @Bean
     public Jackson2JsonMessageConverter jsonMessageConverter() {
@@ -18,7 +21,12 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue orderQueue() {
-        return new Queue(orderQueue);
+    public Queue votoQueue() {
+        return new Queue(votoQueue);
+    }
+
+    @Bean
+    public Queue votoQueueDlq() {
+        return new Queue(votoQueue + "-dlq");
     }
 }

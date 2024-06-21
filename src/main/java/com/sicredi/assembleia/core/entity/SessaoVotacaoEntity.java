@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @Data
 @Builder
+@Table(name = "sessao_votacao")
 public class SessaoVotacaoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

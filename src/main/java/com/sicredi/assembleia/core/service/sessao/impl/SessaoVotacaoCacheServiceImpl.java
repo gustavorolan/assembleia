@@ -26,14 +26,16 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
     private final SessaoVotacaoMapper sessaoVotacaoMapper;
 
     @Override
-    public void inserirVotoEmCache(SessaoVotacaoEntity sessaoVotacaoEntity) {
+    public void inserirSessaoVotacaoEmCache(SessaoVotacaoEntity sessaoVotacaoEntity) {
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = sessaoVotacaoMapper.criarNovaSessaoCache(sessaoVotacaoEntity);
         sessaoVotacaoCacheRepository.save(sessaoVotacaoCacheEntity);
+        logger.info("Sessão votação cache adicionado com sucesso!");
     }
 
 
     @Override
     public SessaoVotacaoCacheEntity findById(Long sessaoVotacaoId) {
+        logger.info("Consultando sessão votação cache com id: {}", sessaoVotacaoId);
         return sessaoVotacaoCacheRepository.findById(sessaoVotacaoId).orElseThrow(() -> {
             SessaoCacheNotFoundException exception = new SessaoCacheNotFoundException();
             logger.error(exception.getMessage(), exception);
@@ -42,7 +44,7 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
     }
 
     @Override
-    public void inserirVotoEmCache(VotoRequest votoRequest) {
+    public void inserirVotoNaSessaoVotacaoEmCache(VotoRequest votoRequest) {
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = findById(votoRequest.getSessaoId());
 
         String cpf = votoRequest.getCpf();
@@ -56,6 +58,8 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
         atualizarNumeroTotalDevotos(sessaoVotacaoCacheEntity);
 
         sessaoVotacaoCacheRepository.save(sessaoVotacaoCacheEntity);
+
+        logger.info("Voto adicionado à sessão votação cache com sucesso!");
     }
 
     private static void atualizarNumeroTotalDevotos(SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity) {
