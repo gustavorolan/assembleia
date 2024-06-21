@@ -29,7 +29,7 @@ public class PautaServiceImpl implements PautaService {
     public Long criar(PautaDto pautaDto) {
         PautaEntity pautaEntity = pautaMapper.pauteDtoToEntity(pautaDto);
         PautaEntity pautaEntitySalva = pautaRepository.save(pautaEntity);
-        logger.info("Criado um pauta com sucesso!");
+        logger.info("Foi criada uma pauta com sucesso. pautaId{}", pautaEntity.getId());
         return pautaEntitySalva.getId();
     }
 

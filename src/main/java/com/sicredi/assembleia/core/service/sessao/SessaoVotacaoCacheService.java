@@ -7,9 +7,9 @@ import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 
 public interface SessaoVotacaoCacheService {
 
-    void inserirVotoEmCache(SessaoVotacaoEntity sessaoVotacaoEntity);
+    void inserirSessaoVotacaoEmCache(SessaoVotacaoEntity sessaoVotacaoEntity);
 
     SessaoVotacaoCacheEntity findById(Long sessaoVotacaoId);
 
-    void inserirVotoEmCache(VotoRequest votoRequest);
+    void inserirVotoNaSessaoVotacaoEmCache(VotoRequest votoRequest);
 }
