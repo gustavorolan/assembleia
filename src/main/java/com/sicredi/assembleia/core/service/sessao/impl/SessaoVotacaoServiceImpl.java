@@ -13,6 +13,7 @@ import com.sicredi.assembleia.core.service.pauta.PautaService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
     private final ZonedDateTimeService zonedDateTimeService;
 
     @Override
+    @Transactional
     public SessaoVotacaoResponse abrir(AberturaSessaoVotacaoRequest aberturaSessaoVotacaoRequest) {
         logger.info("Iniciando processo de abertura da sessão de votação");
 

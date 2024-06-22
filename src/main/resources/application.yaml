@@ -6,7 +6,7 @@ spring:
   sessao_votacao:
     encerramento:
       tempo:
-        ms: 120000
+        ms: 5000
 
   rabbitmq:
     host: localhost
@@ -17,6 +17,8 @@ spring:
       voto:
         nome: voto-queue
         dlq: voto-queue-dlq
+      sessao_votacao_encerramento:
+        nome: sessao-votacao-encerramento
 
   datasource:
     url: jdbc:postgresql://localhost:5432/assembleia

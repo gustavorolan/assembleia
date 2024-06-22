@@ -6,7 +6,7 @@ import com.sicredi.assembleia.core.entity.PautaEntity;
 import com.sicredi.assembleia.core.exception.PautaNotFoundException;
 import com.sicredi.assembleia.core.mapper.PautaMapper;
 import com.sicredi.assembleia.core.repository.PautaRepository;
-import com.sicredi.assembleia.factory.PautaFactory;
+import com.sicredi.assembleia.factory.service.PautaFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

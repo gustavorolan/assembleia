@@ -1,4 +1,4 @@
-package com.sicredi.assembleia.factory;
+package com.sicredi.assembleia.factory.service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

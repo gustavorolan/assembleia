@@ -10,6 +10,8 @@ import java.time.ZonedDateTime;
 @Data
 @Builder
 public class SessaoVotacaoResponse {
+    @Schema(description = "Id da sessão de votação", example = "1")
+    private Long id;
     @Schema(description = "Horário de abertura", example = "2024-06-20T20:32:46.812331Z")
     private ZonedDateTime horaAbertura;
     @Schema(description = "Horário de encerramento", example = "2024-06-20T20:32:46.812331Z")
