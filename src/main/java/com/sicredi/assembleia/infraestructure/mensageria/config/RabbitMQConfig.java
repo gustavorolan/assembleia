@@ -15,6 +15,9 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.queue.voto.dlq}")
     private String votoQueueDlq;
 
+    @Value("${spring.rabbitmq.queue.sessao_votacao_encerramento.nome}")
+    private String sessaoVotacaoEncerramento;
+
     @Bean
     public Jackson2JsonMessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
@@ -28,5 +31,10 @@ public class RabbitMQConfig {
     @Bean
     public Queue votoQueueDlq() {
         return new Queue(votoQueueDlq);
+    }
+
+    @Bean
+    public Queue sessaoVotacaoEncerramentoQueue() {
+        return new Queue(sessaoVotacaoEncerramento);
     }
 }

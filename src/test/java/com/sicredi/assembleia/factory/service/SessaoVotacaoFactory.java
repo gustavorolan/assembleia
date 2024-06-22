@@ -1,4 +1,4 @@
-package com.sicredi.assembleia.factory;
+package com.sicredi.assembleia.factory.service;
 
 import com.sicredi.assembleia.core.dto.AberturaSessaoVotacaoRequest;
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
@@ -48,6 +48,7 @@ public class SessaoVotacaoFactory {
 
     public static SessaoVotacaoResponse.SessaoVotacaoResponseBuilder responseBuilder() {
         return SessaoVotacaoResponse.builder()
+                .id(1L)
                 .total(50)
                 .pautaId(1L)
                 .duracao(60)

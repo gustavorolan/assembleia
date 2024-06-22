@@ -12,7 +12,7 @@ public class SessaoVotacaoMapper {
 
     public SessaoVotacaoResponse sessaoEntityToResponse(SessaoVotacaoEntity entity) {
         return SessaoVotacaoResponse.builder()
-                .pautaId(entity.getId())
+                .id(entity.getId())
                 .duracao(entity.getDuracao())
                 .horaAbertura(entity.getHoraAbertura())
                 .horaEncerramento(entity.getHoraEncerramento())

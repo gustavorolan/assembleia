@@ -7,8 +7,8 @@ import com.sicredi.assembleia.core.exception.SessaoCacheNotFoundException;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoCacheRepository;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
-import com.sicredi.assembleia.factory.SessaoVotacaoFactory;
-import com.sicredi.assembleia.factory.VotoFactory;
+import com.sicredi.assembleia.factory.service.SessaoVotacaoFactory;
+import com.sicredi.assembleia.factory.service.VotoFactory;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -161,7 +161,6 @@ class SessaoVotacaoCacheServiceImplTest {
     @Test
     @DisplayName("Deve deletar corretamente uma entidade de cache.")
     void deveDeletarEntidadeNaSessaoVotacaoEmCache() {
-        VotoRequest votoRequest = VotoFactory.criarRequest();
 
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
 

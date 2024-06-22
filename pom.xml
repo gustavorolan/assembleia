@@ -33,6 +33,7 @@
         <flyway.version>10.1.0</flyway.version>
         <flyway.test.version>10.0.0</flyway.test.version>
         <test.container.version>1.19.8</test.container.version>
+        <test.container.redis.version>2.2.2</test.container.redis.version>
     </properties>
     <dependencies>
         <dependency>
@@ -120,6 +121,20 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <version>${test.container.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <version>${test.container.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.redis</groupId>
+            <artifactId>testcontainers-redis</artifactId>
+            <version>${test.container.redis.version}</version>
             <scope>test</scope>
         </dependency>
 

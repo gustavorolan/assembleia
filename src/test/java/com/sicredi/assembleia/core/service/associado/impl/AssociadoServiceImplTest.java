@@ -2,7 +2,7 @@ package com.sicredi.assembleia.core.service.associado.impl;
 
 import com.sicredi.assembleia.core.entity.AssociadoEntity;
 import com.sicredi.assembleia.core.repository.AssociadoRepository;
-import com.sicredi.assembleia.factory.AssociadoFactory;
+import com.sicredi.assembleia.factory.service.AssociadoFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

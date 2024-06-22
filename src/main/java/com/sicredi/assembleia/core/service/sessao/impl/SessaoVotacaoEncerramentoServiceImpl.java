@@ -1,10 +1,13 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
+import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
+import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.service.dateTime.ZonedDateTimeService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
+import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoEncerramentoProducer;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoEncerramentoService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +25,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SessaoVotacaoEncerramentoServiceImpl implements SessaoVotacaoEncerramentoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(SessaoVotacaoEncerramentoServiceImpl.class);
+
     private final SessaoVotacaoService sessaoVotacaoService;
 
     private final SessaoVotacaoCacheService sessaoVotacaoCacheService;
 
     private final ZonedDateTimeService zonedDateTimeService;
 
-    private static final Logger logger = LoggerFactory.getLogger(SessaoVotacaoEncerramentoServiceImpl.class);
+    private final SessaoVotacaoMapper sessaoVotacaoMapper;
+
+    private final SessaoVotacaoEncerramentoProducer sessaoVotacaoEncerramentoProducer;
 
     @Override
     @Scheduled(fixedRateString = "${spring.sessao_votacao.encerramento.tempo.ms}")
@@ -56,6 +63,9 @@ public class SessaoVotacaoEncerramentoServiceImpl implements SessaoVotacaoEncerr
             sessaoVotacaoService.save(sessao);
             sessaoVotacaoCacheService.delete(sessaoCache);
             logger.info("Sessao encerrada, id: {}", sessao.getId());
+            SessaoVotacaoResponse sessaoVotacaoResponse = sessaoVotacaoMapper.sessaoEntityToResponse(sessao);
+            sessaoVotacaoEncerramentoProducer.send(sessaoVotacaoResponse);
+            logger.info("Mensagem enviada para fila de encerramento, id: {}", sessao.getId());
         }
 
     }

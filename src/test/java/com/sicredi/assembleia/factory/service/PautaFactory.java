@@ -1,4 +1,4 @@
-package com.sicredi.assembleia.factory;
+package com.sicredi.assembleia.factory.service;
 
 import com.sicredi.assembleia.core.dto.PautaRequest;
 import com.sicredi.assembleia.core.dto.PautaResponse;
