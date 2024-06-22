@@ -1,6 +1,6 @@
 package com.sicredi.assembleia.rest;
 
-import com.sicredi.assembleia.core.dto.PautaDto;
+import com.sicredi.assembleia.core.dto.PautaRequest;
 import com.sicredi.assembleia.core.dto.PautaResponse;
 import com.sicredi.assembleia.core.service.pauta.impl.PautaServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,8 +31,8 @@ public class PautaController {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "401", description = "NotFound"),
     })
-    public ResponseEntity<Long> criar(@Valid @RequestBody PautaDto pautaDto) {
-        Long response = pautaServiceImpl.criar(pautaDto);
+    public ResponseEntity<Long> criar(@Valid @RequestBody PautaRequest pautaRequest) {
+        Long response = pautaServiceImpl.criar(pautaRequest);
         return ResponseEntity.created(URI.create("/api/v0/pauta/" + response.toString()))
                 .body(response);
     }

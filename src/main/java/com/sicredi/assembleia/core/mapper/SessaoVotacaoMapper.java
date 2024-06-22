@@ -2,7 +2,6 @@ package com.sicredi.assembleia.core.mapper;
 
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
 import com.sicredi.assembleia.core.entity.*;
-import com.sicredi.assembleia.core.factory.DateTimeFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -10,8 +9,6 @@ import java.util.ArrayList;
 
 @Component
 public class SessaoVotacaoMapper {
-
-    public static final int MINUTOS_PARA_SEGUNDOS = 60;
 
     public SessaoVotacaoResponse sessaoEntityToResponse(SessaoVotacaoEntity entity) {
         return SessaoVotacaoResponse.builder()
@@ -27,8 +24,7 @@ public class SessaoVotacaoMapper {
                 .build();
     }
 
-    public SessaoVotacaoEntity criarNovaSessao(PautaEntity pautaEntity, int duracaoMinutos) {
-        ZonedDateTime now = DateTimeFactory.now();
+    public SessaoVotacaoEntity criarNovaSessao(PautaEntity pautaEntity, int duracaoMinutos, ZonedDateTime now) {
 
         return SessaoVotacaoEntity.builder()
                 .pauta(pautaEntity)
@@ -42,7 +38,7 @@ public class SessaoVotacaoMapper {
                 .build();
     }
 
-    public SessaoVotacaoCacheEntity criarNovaSessaoCache(SessaoVotacaoEntity entity) {
+    public SessaoVotacaoCacheEntity criarNovaSessaoCache(SessaoVotacaoEntity entity, Long ttl) {
 
         return SessaoVotacaoCacheEntity.builder()
                 .pautaId(entity.getPauta().getId())
@@ -52,7 +48,7 @@ public class SessaoVotacaoMapper {
                 .total(0)
                 .horaEncerramento(entity.getHoraEncerramento())
                 // Conversão para minutos
-                .ttl(86400L)
+                .ttl(ttl)
                 .build();
     }
 }

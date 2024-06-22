@@ -10,6 +10,7 @@ import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,9 +26,13 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
 
     private final SessaoVotacaoMapper sessaoVotacaoMapper;
 
+    @Value("${spring.data.redis.sessao_votacao_cache.ttl}")
+    private String sessaoCacheTtl;
+
+
     @Override
     public void inserirSessaoVotacaoEmCache(SessaoVotacaoEntity sessaoVotacaoEntity) {
-        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = sessaoVotacaoMapper.criarNovaSessaoCache(sessaoVotacaoEntity);
+        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = sessaoVotacaoMapper.criarNovaSessaoCache(sessaoVotacaoEntity, Long.parseLong(sessaoCacheTtl));
         sessaoVotacaoCacheRepository.save(sessaoVotacaoCacheEntity);
         logger.info("Sessão votação cache adicionado com sucesso!");
     }
@@ -60,6 +65,11 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
         sessaoVotacaoCacheRepository.save(sessaoVotacaoCacheEntity);
 
         logger.info("Voto adicionado à sessão votação cache com sucesso!");
+    }
+
+    @Override
+    public void delete(SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity){
+        sessaoVotacaoCacheRepository.delete(sessaoVotacaoCacheEntity);
     }
 
     private static void atualizarNumeroTotalDevotos(SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity) {

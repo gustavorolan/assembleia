@@ -12,4 +12,6 @@ public interface SessaoVotacaoCacheService {
     SessaoVotacaoCacheEntity findById(Long sessaoVotacaoId);
 
     void inserirVotoNaSessaoVotacaoEmCache(VotoRequest votoRequest);
+
+    void delete(SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity);
 }

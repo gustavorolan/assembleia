@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PautaDto {
+public class PautaRequest {
     @NotNull(message = "Nome da pauta não pode ser nulo!")
     @Schema(description = "Nome para pauta", example = "Nome")
     private String nome;

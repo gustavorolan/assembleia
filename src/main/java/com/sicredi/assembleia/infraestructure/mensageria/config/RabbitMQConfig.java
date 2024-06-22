@@ -27,6 +27,6 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue votoQueueDlq() {
-        return new Queue(votoQueue + "-dlq");
+        return new Queue(votoQueueDlq);
     }
 }

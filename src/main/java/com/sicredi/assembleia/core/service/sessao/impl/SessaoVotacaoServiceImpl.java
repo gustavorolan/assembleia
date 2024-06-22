@@ -8,6 +8,7 @@ import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
 import com.sicredi.assembleia.core.exception.PautaJaTemUmaSessaoVotacaoException;
 import com.sicredi.assembleia.core.exception.SessaoNotFoundException;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoRepository;
+import com.sicredi.assembleia.core.service.dateTime.ZonedDateTimeService;
 import com.sicredi.assembleia.core.service.pauta.PautaService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
@@ -32,7 +33,9 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
 
     private final SessaoVotacaoMapper sessaoVotacaoMapper;
 
-    private final SessaoVotacaoCacheService  sessaoVotacaoCacheService;
+    private final SessaoVotacaoCacheService sessaoVotacaoCacheService;
+
+    private final ZonedDateTimeService zonedDateTimeService;
 
     @Override
     public SessaoVotacaoResponse abrir(AberturaSessaoVotacaoRequest aberturaSessaoVotacaoRequest) {
@@ -40,12 +43,15 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
 
         PautaEntity pautaEntity = pautaService.findById(aberturaSessaoVotacaoRequest.getPautaId());
 
-        SessaoVotacaoEntity sessaoVotacaoEntity = sessaoVotacaoMapper
-                .criarNovaSessao(pautaEntity, aberturaSessaoVotacaoRequest.getDuracaoMinutos());
+        SessaoVotacaoEntity sessaoVotacaoEntity = sessaoVotacaoMapper.criarNovaSessao(
+                pautaEntity,
+                aberturaSessaoVotacaoRequest.getDuracaoMinutos(),
+                zonedDateTimeService.now()
+        );
 
         SessaoVotacaoEntity sessaoVotacaoSaved = save(sessaoVotacaoEntity);
 
-        sessaoVotacaoCacheService.inserirSessaoVotacaoEmCache(sessaoVotacaoEntity);
+        sessaoVotacaoCacheService.inserirSessaoVotacaoEmCache(sessaoVotacaoSaved);
 
         logger.info("Sessão de votação foi aberta com sucesso. sessaoId: {}", sessaoVotacaoSaved.getId());
         return sessaoVotacaoMapper.sessaoEntityToResponse(sessaoVotacaoSaved);
@@ -73,16 +79,16 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
     }
 
     @Override
-    public List<SessaoVotacaoEntity> findAllStatusAberto(){
+    public List<SessaoVotacaoEntity> findAllStatusAberto() {
         logger.info("Consultando todas sessões abertas.");
         return sessaoVotacaoRepository.findAllByStatus(SessaoVotacaoEnum.ABERTA);
     }
 
     @Override
-    public SessaoVotacaoEntity save (SessaoVotacaoEntity entity){
+    public SessaoVotacaoEntity save(SessaoVotacaoEntity entity) {
         try {
             return sessaoVotacaoRepository.save(entity);
-        }catch (DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             logger.error(e.getMessage(), e);
             throw new PautaJaTemUmaSessaoVotacaoException();
         }

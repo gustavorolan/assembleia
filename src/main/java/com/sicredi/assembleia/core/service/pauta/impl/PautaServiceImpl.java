@@ -1,11 +1,10 @@
 package com.sicredi.assembleia.core.service.pauta.impl;
 
-import com.sicredi.assembleia.core.dto.PautaDto;
+import com.sicredi.assembleia.core.dto.PautaRequest;
 import com.sicredi.assembleia.core.dto.PautaResponse;
 import com.sicredi.assembleia.core.entity.PautaEntity;
 import com.sicredi.assembleia.core.exception.PautaNotFoundException;
 import com.sicredi.assembleia.core.repository.PautaRepository;
-import com.sicredi.assembleia.core.repository.SessaoVotacaoCacheRepository;
 import com.sicredi.assembleia.core.service.pauta.PautaService;
 import com.sicredi.assembleia.core.mapper.PautaMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,9 @@ public class PautaServiceImpl implements PautaService {
 
     private final PautaMapper pautaMapper;
 
-    private final SessaoVotacaoCacheRepository sessaoVotacaoCacheRepository;
-
     @Override
-    public Long criar(PautaDto pautaDto) {
-        PautaEntity pautaEntity = pautaMapper.pauteDtoToEntity(pautaDto);
+    public Long criar(PautaRequest pautaRequest) {
+        PautaEntity pautaEntity = pautaMapper.pauteDtoToEntity(pautaRequest);
         PautaEntity pautaEntitySalva = pautaRepository.save(pautaEntity);
         logger.info("Foi criada uma pauta com sucesso. pautaId{}", pautaEntity.getId());
         return pautaEntitySalva.getId();
