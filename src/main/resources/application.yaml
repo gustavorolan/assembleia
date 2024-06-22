@@ -27,6 +27,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+      sessao_votacao_cache:
+        ttl: 86400
 
   flyway:
     enabled: true

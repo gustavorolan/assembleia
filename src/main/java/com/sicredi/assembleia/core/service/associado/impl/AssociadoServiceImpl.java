@@ -13,11 +13,13 @@ public class AssociadoServiceImpl implements AssociadoService {
     private final AssociadoRepository associadoRepository;
 
     @Override
-    public AssociadoEntity upsert(String cpf) {
+    public AssociadoEntity findOrInsert(String cpf) {
+        return associadoRepository.findByCpf(cpf)
+                .orElseGet(() -> createNewEntity(cpf));
+    }
 
-        AssociadoEntity associadoEntity = associadoRepository.findByCpf(cpf)
-                .orElseGet(() -> AssociadoEntity.builder().cpf(cpf).build());
-
-        return associadoRepository.save(associadoEntity);
+    private AssociadoEntity createNewEntity(String cpf) {
+        AssociadoEntity entity = AssociadoEntity.builder().cpf(cpf).build();
+        return associadoRepository.save(entity);
     }
 }

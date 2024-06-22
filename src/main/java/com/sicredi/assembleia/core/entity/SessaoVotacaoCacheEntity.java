@@ -32,6 +32,7 @@ public class SessaoVotacaoCacheEntity {
     private List<String> associadosCpfs = new ArrayList<>();
 
     private Integer total = 0;
+
     @TimeToLive
     private Long ttl = 86400L;
 }

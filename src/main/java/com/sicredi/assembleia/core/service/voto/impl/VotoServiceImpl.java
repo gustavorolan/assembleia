@@ -4,6 +4,7 @@ import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.*;
 import com.sicredi.assembleia.core.repository.VotoRepository;
 import com.sicredi.assembleia.core.service.associado.AssociadoService;
+import com.sicredi.assembleia.core.service.dateTime.ZonedDateTimeService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
 import com.sicredi.assembleia.core.service.sessao.impl.SessaoVotacaoCacheServiceImpl;
@@ -39,12 +40,14 @@ public class VotoServiceImpl implements VotoService {
 
     private final VotoProducer votoProducer;
 
+    private final ZonedDateTimeService zonedDateTimeService;
+
     @Override
     public void votar(VotoRequest votoRequest) {
 
         SessaoVotacaoCacheEntity sessaoVotacaoCache = sessaoVotacaoCacheService.findById(votoRequest.getSessaoId());
 
-        votacaoVerfiers.forEach(verifier -> verifier.verify(votoRequest, sessaoVotacaoCache));
+        votacaoVerfiers.forEach(verifier -> verifier.verify(votoRequest, sessaoVotacaoCache, zonedDateTimeService.now()));
 
         votoProducer.send(votoRequest);
 
@@ -58,7 +61,7 @@ public class VotoServiceImpl implements VotoService {
     public void consume(VotoRequest votoRequest) {
         SessaoVotacaoEntity sessaoVotacaoEntity = sessaoVotacaoService.findById(votoRequest.getSessaoId());
 
-        AssociadoEntity associadoEntity = associadoService.upsert(votoRequest.getCpf());
+        AssociadoEntity associadoEntity = associadoService.findOrInsert(votoRequest.getCpf());
 
         logger.info("Inicio do processamento da mensagem de votação. sessaoVotacao: {} usuarioId: {}",
                 votoRequest.getSessaoId(), associadoEntity.getId());
