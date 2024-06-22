@@ -1,0 +1,35 @@
+spring:
+
+  application:
+    name: integracao_logistica
+
+  sessao_votacao:
+    encerramento:
+      tempo:
+        ms: 300
+
+  rabbitmq:
+    host: rabbit
+    username: guest
+    password: guest
+    queue:
+      voto:
+        nome: voto-queue
+        dlq: voto-queue-dlq
+
+  datasource:
+    username: postgres
+    password: 123456
+
+  data:
+    redis:
+      host: redis
+      sessao_votacao_cache:
+        ttl: 86400
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+
+
