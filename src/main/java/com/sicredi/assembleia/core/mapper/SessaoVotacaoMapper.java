@@ -2,10 +2,10 @@ package com.sicredi.assembleia.core.mapper;
 
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
 import com.sicredi.assembleia.core.entity.*;
+import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 
 @Component
 public class SessaoVotacaoMapper {
@@ -43,7 +43,7 @@ public class SessaoVotacaoMapper {
         return SessaoVotacaoCacheEntity.builder()
                 .pautaId(entity.getPauta().getId())
                 .id(entity.getId())
-                .associadosCpfs(new ArrayList<>())
+                .associadosCpfs(SetCpfFactory.create())
                 .horaAbertura(entity.getHoraAbertura())
                 .total(0)
                 .horaEncerramento(entity.getHoraEncerramento())

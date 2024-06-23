@@ -3,6 +3,7 @@ package com.sicredi.assembleia.core.service.voto.impl;
 import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.exception.UsuarioVotacaoException;
+import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import com.sicredi.assembleia.factory.service.SessaoVotacaoFactory;
 import com.sicredi.assembleia.factory.service.VotoFactory;
 import com.sicredi.assembleia.factory.service.ZonedDateTimeFactory;
@@ -12,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class UsuarioVotacaoVerifierTest {
@@ -26,7 +25,7 @@ class UsuarioVotacaoVerifierTest {
     void deveLancarExcecaoPoisUsarioJaVotou() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .associadosCpfs(List.of(votoRequest.getCpf()))
+                .associadosCpfs(SetCpfFactory.create(votoRequest.getCpf()))
                 .build();
 
         Assertions.assertThrowsExactly(UsuarioVotacaoException.class, () ->
@@ -43,7 +42,7 @@ class UsuarioVotacaoVerifierTest {
     void naoDeveLancarExcecaoPoisUsarioNaoVotou() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .associadosCpfs(List.of())
+                .associadosCpfs(SetCpfFactory.create())
                 .build();
 
         usuarioVotacaoVerifier.verify(
