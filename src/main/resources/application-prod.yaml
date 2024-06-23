@@ -11,8 +11,8 @@ spring:
   rabbitmq:
     host: rabbitmq
     port: 5672
-    username: guest
-    password: guest
+    username:  ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
     queue:
       voto:
         nome: voto-queue
@@ -22,8 +22,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://postgres:5432/assembleia
-    username: postgres
-    password: 123456
+    username:  ${POSTGRES_USER}
+    password: ${POSTGRES_DB}
 
   data:
     redis:
@@ -39,5 +39,3 @@ spring:
 logging:
   level:
     root: INFO
-
-

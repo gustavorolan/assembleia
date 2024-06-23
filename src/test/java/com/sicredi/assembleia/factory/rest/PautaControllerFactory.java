@@ -7,15 +7,19 @@ import com.sicredi.assembleia.rest.PautaController;
 import org.junit.jupiter.api.*;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Objects;
+
 public class PautaControllerFactory {
 
     public static PautaResponse deveCriarUmaPautaComSucesso(PautaController pautaController) {
         PautaRequest pautaRequest = PautaFactory.criarRequest();
-        ResponseEntity<Long> criarPautaReponse = pautaController.criar(pautaRequest);
-        ResponseEntity<PautaResponse> findByIdPautaResponse = pautaController.findById(criarPautaReponse.getBody());
+        ResponseEntity<PautaResponse> criarPautaReponse = pautaController.criar(pautaRequest);
+        ResponseEntity<PautaResponse> findByIdPautaResponse = pautaController.findById(
+                Objects.requireNonNull(criarPautaReponse.getBody()).getId()
+        );
 
         Assertions.assertInstanceOf(PautaResponse.class, findByIdPautaResponse.getBody());
-        Assertions.assertInstanceOf(Long.class, criarPautaReponse.getBody());
+        Assertions.assertInstanceOf(PautaResponse.class, criarPautaReponse.getBody());
         Assertions.assertEquals(findByIdPautaResponse.getBody().getDescricao(), pautaRequest.getDescricao());
         Assertions.assertEquals(findByIdPautaResponse.getBody().getName(), pautaRequest.getNome());
         Assertions.assertInstanceOf(Long.class, findByIdPautaResponse.getBody().getId());

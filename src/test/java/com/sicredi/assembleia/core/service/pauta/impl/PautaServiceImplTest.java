@@ -23,8 +23,7 @@ class PautaServiceImplTest {
 
     private final PautaMapper pautaMapper = new PautaMapper();
 
-    @InjectMocks
-    private PautaServiceImpl pautaService = new PautaServiceImpl(pautaRepository, pautaMapper);
+    private final PautaServiceImpl pautaService = new PautaServiceImpl(pautaRepository, pautaMapper);
 
     @Captor
     private ArgumentCaptor<PautaEntity> pautaCaptor;
@@ -37,17 +36,18 @@ class PautaServiceImplTest {
         PautaEntity pautaEntityExpected = PautaFactory.entityBuilder()
                 .id(null)
                 .build();
+        PautaResponse pautaResponse = PautaFactory.criarResponse();
 
         Mockito.when(pautaRepository.save(Mockito.any(PautaEntity.class)))
                 .thenReturn(pautaEntity);
 
-        Long response = pautaService.criar(pautaRequest);
+        PautaResponse response = pautaService.criar(pautaRequest);
 
         Mockito.verify(pautaRepository).save(pautaCaptor.capture());
 
         Mockito.verifyNoMoreInteractions(pautaRepository);
 
-        Assertions.assertEquals(pautaEntity.getId(), response);
+        Assertions.assertEquals(pautaResponse, response);
         Assertions.assertEquals(pautaEntityExpected, pautaCaptor.getValue());
     }
 

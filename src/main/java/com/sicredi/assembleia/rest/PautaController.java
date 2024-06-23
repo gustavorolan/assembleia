@@ -31,9 +31,9 @@ public class PautaController {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "401", description = "NotFound"),
     })
-    public ResponseEntity<Long> criar(@Valid @RequestBody PautaRequest pautaRequest) {
-        Long response = pautaServiceImpl.criar(pautaRequest);
-        return ResponseEntity.created(URI.create("/api/v0/pauta/" + response.toString()))
+    public ResponseEntity<PautaResponse> criar(@Valid @RequestBody PautaRequest pautaRequest) {
+        PautaResponse response = pautaServiceImpl.criar(pautaRequest);
+        return ResponseEntity.created(URI.create("/api/v0/pauta/" + response.getId().toString()))
                 .body(response);
     }
 
