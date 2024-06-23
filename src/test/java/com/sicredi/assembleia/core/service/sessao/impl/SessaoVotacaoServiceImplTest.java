@@ -21,6 +21,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -208,4 +212,26 @@ class SessaoVotacaoServiceImplTest {
         Assertions.assertEquals(sessaoVotacaoResponse, response);
     }
 
+    @Test
+    @DisplayName("Deve retornar sessões por status e paginada")
+    void deveRetornarSessaoPorStatusPaginada() {
+        int page = 0;
+        List<SessaoVotacaoEntity> sessoesVotacaoEntities = List.of(SessaoVotacaoFactory.criarEntidade(), SessaoVotacaoFactory.criarEntidade());
+        List<SessaoVotacaoResponse> sessoesVotacaoResponses = List.of(SessaoVotacaoFactory.criarResponse(), SessaoVotacaoFactory.criarResponse());
+        PageRequest pageRequest = PageRequest.of(page, 10, Sort.Direction.DESC, "id");
+        PageImpl<SessaoVotacaoEntity> sessoesVotacaoEntitiesPage = new PageImpl<>(sessoesVotacaoEntities, pageRequest, sessoesVotacaoEntities.size());
+        PageImpl<SessaoVotacaoResponse> sessoesVotacaoResponsesPage = new PageImpl<>(sessoesVotacaoResponses, pageRequest, sessoesVotacaoResponses.size());
+        SessaoVotacaoEnum status = SessaoVotacaoEnum.ABERTA;
+
+        Mockito.when(sessaoVotacaoRepository.findAllByStatus(status,pageRequest))
+                .thenReturn(sessoesVotacaoEntitiesPage);
+
+        Page<SessaoVotacaoResponse> responses = sessaoVotacaoService.findAllByStatus(page, status);
+
+        Mockito.verify(sessaoVotacaoRepository, Mockito.times(1)).findAllByStatus(status, pageRequest);
+
+        Assertions.assertEquals(sessoesVotacaoResponsesPage, responses);
+
+        Mockito.verifyNoMoreInteractions(sessaoVotacaoRepository);
+    }
 }

@@ -9,7 +9,7 @@ spring:
         ms: 60000
 
   rabbitmq:
-    host: rabbitmq
+    host: localhost
     port: 5672
     username: guest
     password: guest
@@ -21,13 +21,13 @@ spring:
         nome: sessao-votacao-encerramento
 
   datasource:
-    url: jdbc:postgresql://postgres:5432/assembleia
+    url: jdbc:postgresql://localhost:5432/assembleia
     username: postgres
     password: 123456
 
   data:
     redis:
-      host: redis
+      host: localhost
       port: 6379
       sessao_votacao_cache:
         ttl: 2592000

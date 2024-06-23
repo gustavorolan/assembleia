@@ -6,7 +6,7 @@ spring:
   sessao_votacao:
     encerramento:
       tempo:
-        ms: 5000
+        ms: ${SESSAO_VOTACAO_ENCERRAMENTO_TEMPO}
 
   rabbitmq:
     host: rabbitmq
@@ -30,7 +30,7 @@ spring:
       host: redis
       port: 6379
       sessao_votacao_cache:
-        ttl: 86400
+        ttl: 2592000
 
   flyway:
     enabled: true
