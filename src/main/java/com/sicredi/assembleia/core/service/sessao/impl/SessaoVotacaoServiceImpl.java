@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +30,12 @@ import java.util.List;
 public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
 
     private static final Logger logger = LoggerFactory.getLogger(SessaoVotacaoServiceImpl.class);
+
+    private static final int TAMANHO_PAGINACAO = 10;
+
+    private static final String PROPRIEDADE_PARA_ORDENCAO = "id";
+
+    private static final Sort.Direction DIRECAO_ORDERNACAO = Sort.Direction.DESC;
 
     private final SessaoVotacaoRepository sessaoVotacaoRepository;
 
@@ -94,5 +103,15 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
             logger.error(e.getMessage(), e);
             throw new PautaJaTemUmaSessaoVotacaoException();
         }
+    }
+
+    @Override
+    public Page<SessaoVotacaoResponse> findAllByStatus(int page, SessaoVotacaoEnum status) {
+        return sessaoVotacaoRepository.findAllByStatus(status, pageRequest(page))
+                .map(sessaoVotacaoMapper::sessaoEntityToResponse);
+    }
+
+    private PageRequest pageRequest(int page) {
+        return PageRequest.of(page,TAMANHO_PAGINACAO, DIRECAO_ORDERNACAO,PROPRIEDADE_PARA_ORDENCAO);
     }
 }

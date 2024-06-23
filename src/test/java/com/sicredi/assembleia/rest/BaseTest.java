@@ -29,7 +29,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
         mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
 @FlywayTest
-abstract class BaseTest {
+public abstract class BaseTest {
 
     public static GenericContainer<?> rabbitMQContainer = new RabbitMQContainer("rabbitmq:management")
             .withExposedPorts(5672)
