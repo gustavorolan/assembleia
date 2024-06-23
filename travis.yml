@@ -1,0 +1,22 @@
+language: generic
+
+sudo: false
+
+services:
+  - docker
+
+before_install:
+  - docker build -t gustavo/assembleia -f Dockerfile .
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-1"
+  app: "tryout"
+  env: "Tryout-env"
+  bucket_name: "elasticbeanstalk-us-east-1-830665105132"
+  bucket_path: "tryout"
+  on:
+    branch: main
+  access_key_id: "$SECRET_ID"
+  secret_access_key: "$SECRET_KEY"
+  version_label: "v1.0.0"

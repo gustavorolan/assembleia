@@ -1,0 +1,53 @@
+# Ignore general build artifacts and IDE-specific files
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Ignore IDE-specific files and directories
+### STS ###
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore generated documentation
+HELP.md
+
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+logs/
+
+# Ignore Maven and Gradle specific files
+### Maven ###
+*.log
+*.swp
+*~
+
+### Gradle ###
+.gradle/
+build/
