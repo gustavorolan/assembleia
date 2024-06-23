@@ -5,7 +5,7 @@ import com.sicredi.assembleia.core.dto.PautaResponse;
 import com.sicredi.assembleia.core.entity.PautaEntity;
 
 public interface PautaService {
-    Long criar(PautaRequest pautaRequest);
+    PautaResponse criar(PautaRequest pautaRequest);
 
     PautaEntity findById(Long id);
 

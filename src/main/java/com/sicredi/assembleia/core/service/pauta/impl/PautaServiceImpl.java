@@ -23,11 +23,11 @@ public class PautaServiceImpl implements PautaService {
     private final PautaMapper pautaMapper;
 
     @Override
-    public Long criar(PautaRequest pautaRequest) {
+    public PautaResponse criar(PautaRequest pautaRequest) {
         PautaEntity pautaEntity = pautaMapper.pauteDtoToEntity(pautaRequest);
         PautaEntity pautaEntitySalva = pautaRepository.save(pautaEntity);
         logger.info("Foi criada uma pauta com sucesso. pautaId{}", pautaEntity.getId());
-        return pautaEntitySalva.getId();
+        return pautaMapper.pautaEntityToResponse(pautaEntitySalva);
     }
 
 
