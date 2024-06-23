@@ -5,8 +5,7 @@ import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
-
-import java.util.ArrayList;
+import com.sicredi.assembleia.core.factory.SetCpfFactory;
 
 public class SessaoVotacaoFactory {
     public static SessaoVotacaoEntity.SessaoVotacaoEntityBuilder entidadeBuilder() {
@@ -30,7 +29,7 @@ public class SessaoVotacaoFactory {
         return SessaoVotacaoCacheEntity.builder()
                 .id(1L)
                 .pautaId(1L)
-                .associadosCpfs(new ArrayList<>())
+                .associadosCpfs(SetCpfFactory.create())
                 .total(50)
                 .ttl(86400L)
                 .horaEncerramento(ZonedDateTimeFactory.criarEncerramento())

@@ -1,5 +1,6 @@
 package com.sicredi.assembleia.core.entity;
 
+import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +10,7 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @RedisHash("SessaoVotacaoCache")
 @Data
@@ -29,7 +29,7 @@ public class SessaoVotacaoCacheEntity {
 
     private ZonedDateTime horaEncerramento = ZonedDateTime.now();
 
-    private List<String> associadosCpfs = new ArrayList<>();
+    private Set<Long> associadosCpfs = SetCpfFactory.create();
 
     private Integer total = 0;
 

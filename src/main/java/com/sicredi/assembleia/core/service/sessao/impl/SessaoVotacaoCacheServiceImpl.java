@@ -4,6 +4,7 @@ import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.exception.SessaoCacheNotFoundException;
+import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoCacheRepository;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
@@ -13,8 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -53,12 +53,12 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = findById(votoRequest.getSessaoId());
 
         String cpf = votoRequest.getCpf();
-        List<String> associadosIds = sessaoVotacaoCacheEntity.getAssociadosCpfs();
+        Set<Long> associadosIds = sessaoVotacaoCacheEntity.getAssociadosCpfs();
 
         if (associadosIds == null)
-            sessaoVotacaoCacheEntity.setAssociadosCpfs(List.of(cpf));
+            sessaoVotacaoCacheEntity.setAssociadosCpfs(SetCpfFactory.create(cpf));
         else
-            sessaoVotacaoCacheEntity.getAssociadosCpfs().add(cpf);
+            sessaoVotacaoCacheEntity.getAssociadosCpfs().add(Long.parseLong(cpf));
 
         atualizarNumeroTotalDevotos(sessaoVotacaoCacheEntity);
 

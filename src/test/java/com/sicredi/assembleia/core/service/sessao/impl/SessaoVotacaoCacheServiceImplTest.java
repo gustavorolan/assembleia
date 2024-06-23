@@ -4,6 +4,7 @@ import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.exception.SessaoCacheNotFoundException;
+import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoCacheRepository;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
@@ -17,8 +18,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -113,7 +112,7 @@ class SessaoVotacaoCacheServiceImplTest {
 
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntityExpected = SessaoVotacaoFactory.entidadeCacheBuilder()
                 .total(1)
-                .associadosCpfs(List.of(votoRequest.getCpf()))
+                .associadosCpfs(SetCpfFactory.create(votoRequest.getCpf()))
                 .build();
 
         Mockito.when(sessaoVotacaoCacheRepository.findById(votoRequest.getSessaoId()))
@@ -136,12 +135,12 @@ class SessaoVotacaoCacheServiceImplTest {
 
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
                 .total(0)
-                .associadosCpfs(new ArrayList<>())
+                .associadosCpfs(SetCpfFactory.create())
                 .build();
 
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntityExpected = SessaoVotacaoFactory.entidadeCacheBuilder()
                 .total(1)
-                .associadosCpfs(List.of(votoRequest.getCpf()))
+                .associadosCpfs(SetCpfFactory.create(votoRequest.getCpf()))
                 .build();
 
         Mockito.when(sessaoVotacaoCacheRepository.findById(votoRequest.getSessaoId()))
