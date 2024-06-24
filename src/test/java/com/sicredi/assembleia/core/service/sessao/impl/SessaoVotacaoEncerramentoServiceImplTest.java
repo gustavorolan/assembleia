@@ -1,15 +1,13 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
+import com.sicredi.assembleia.core.entity.MessageSessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.service.dateTime.ZonedDateTimeService;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoEncerramentoProducer;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoEncerramentoService;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
+import com.sicredi.assembleia.core.service.sessao.*;
 import com.sicredi.assembleia.factory.service.SessaoVotacaoFactory;
 import com.sicredi.assembleia.factory.service.ZonedDateTimeFactory;
 import org.junit.jupiter.api.Assertions;
@@ -35,13 +33,16 @@ class SessaoVotacaoEncerramentoServiceImplTest {
 
     private final SessaoVotacaoMapper sessaoVotacaoMapper = new SessaoVotacaoMapper();
 
+    private final MessageSessaoVotacaoService messageSessaoVotacaoService = Mockito.mock(MessageSessaoVotacaoService.class);
+
     private final SessaoVotacaoEncerramentoService sessaoVotacaoEncerramentoService =
             new SessaoVotacaoEncerramentoServiceImpl(
                     sessaoVotacaoService,
                     sessaoVotacaoCacheService,
                     zonedDateTimeService,
                     sessaoVotacaoMapper,
-                    sessaoVotacaoEncerramentoProducer
+                    sessaoVotacaoEncerramentoProducer,
+                    messageSessaoVotacaoService
             );
 
     @Captor
@@ -50,23 +51,26 @@ class SessaoVotacaoEncerramentoServiceImplTest {
     @Test
     @DisplayName("Deve encerrar sessão corretamente.")
     void deveEncerrarSessaoCorretamente() {
+        MessageSessaoVotacaoEntity messageSessaoVotacaoEntity = SessaoVotacaoFactory.createMessageSessaoVotacaoEntity();
         SessaoVotacaoEntity sessaoVotacaoEntity = SessaoVotacaoFactory.criarEntidade();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
         ZonedDateTime zonedDateTime = ZonedDateTimeFactory.criarForaDoEncerramentoEAbertura();
 
         Mockito.when(sessaoVotacaoService.findAllStatusAberto()).thenReturn(List.of(sessaoVotacaoEntity));
-        Mockito.when(sessaoVotacaoCacheService.findById(sessaoVotacaoCacheEntity.getId())).thenReturn(sessaoVotacaoCacheEntity);
         Mockito.when(zonedDateTimeService.now()).thenReturn(zonedDateTime);
+        Mockito.when(messageSessaoVotacaoService.findBySessaoId(sessaoVotacaoEntity.getId()))
+                .thenReturn(messageSessaoVotacaoEntity);
 
         sessaoVotacaoEncerramentoService.encerrar();
 
         Mockito.verify(sessaoVotacaoService, Mockito.times(1)).findAllStatusAberto();
-        Mockito.verify(sessaoVotacaoCacheService, Mockito.times(1)).findById(sessaoVotacaoCacheEntity.getId());
         Mockito.verify(zonedDateTimeService, Mockito.times(1)).now();
         Mockito.verify(sessaoVotacaoService, Mockito.times(1)).save(sessaoVotacaoCaptor.capture());
-        Mockito.verify(sessaoVotacaoCacheService, Mockito.times(1)).delete(sessaoVotacaoCacheEntity);
-        Mockito.verify(sessaoVotacaoEncerramentoProducer,Mockito.times(1))
+        Mockito.verify(sessaoVotacaoCacheService, Mockito.times(1)).delete(sessaoVotacaoCacheEntity.getId());
+        Mockito.verify(sessaoVotacaoEncerramentoProducer, Mockito.times(1))
                 .send(Mockito.any(SessaoVotacaoResponse.class));
+        Mockito.verify(messageSessaoVotacaoService, Mockito.times(1))
+                .findBySessaoId(sessaoVotacaoEntity.getId());
 
         Assertions.assertEquals(SessaoVotacaoEnum.ENCERRADA, sessaoVotacaoCaptor.getValue().getStatus());
 
@@ -81,17 +85,17 @@ class SessaoVotacaoEncerramentoServiceImplTest {
         ZonedDateTime zonedDateTime = ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura();
 
         Mockito.when(sessaoVotacaoService.findAllStatusAberto()).thenReturn(List.of(sessaoVotacaoEntity));
-        Mockito.when(sessaoVotacaoCacheService.findById(sessaoVotacaoCacheEntity.getId())).thenReturn(sessaoVotacaoCacheEntity);
         Mockito.when(zonedDateTimeService.now()).thenReturn(zonedDateTime);
 
         sessaoVotacaoEncerramentoService.encerrar();
 
         Mockito.verify(sessaoVotacaoService, Mockito.times(1)).findAllStatusAberto();
-        Mockito.verify(sessaoVotacaoCacheService, Mockito.times(1)).findById(sessaoVotacaoCacheEntity.getId());
         Mockito.verify(zonedDateTimeService, Mockito.times(1)).now();
         Mockito.verify(sessaoVotacaoService, Mockito.times(0)).save(Mockito.any());
-        Mockito.verify(sessaoVotacaoEncerramentoProducer,Mockito.times(0))
+        Mockito.verify(sessaoVotacaoEncerramentoProducer, Mockito.times(0))
                 .send(Mockito.any(SessaoVotacaoResponse.class));
+        Mockito.verify(messageSessaoVotacaoService, Mockito.times(0))
+                .findBySessaoId(Mockito.any(Long.class));
 
         Mockito.verifyNoMoreInteractions(sessaoVotacaoService, zonedDateTimeService, sessaoVotacaoCacheService);
     }

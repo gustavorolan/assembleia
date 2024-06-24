@@ -21,18 +21,20 @@ class CpfVotacaoVerifierTest {
     private CpfVotacaoVerifier cpfVotacaoVerifier;
 
     @Test
-    @DisplayName("Deve lançar exceção pois cpd está no formato incorreto")
+    @DisplayName("Deve lançar exceção pois cpf está no formato incorreto")
     void deveLancarExcecaoCpfErrado() {
         VotoRequest votoRequest = VotoFactory.requestBuilder()
                 .cpf("21321as")
                 .build();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
+        boolean isAssociadoTentandoVotarNovamente = false;
 
         Assertions.assertThrowsExactly(CpfInvalidoException.class, () ->
                 cpfVotacaoVerifier.verify(
                         votoRequest,
                         sessaoVotacaoCacheEntity,
-                        ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura()
+                        ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura(),
+                        isAssociadoTentandoVotarNovamente
                 )
         );
     }
@@ -42,10 +44,12 @@ class CpfVotacaoVerifierTest {
     void naoDeveLancarExcecaoCpfCorreto() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
+        boolean isAssociadoTentandoVotarNovamente = false;
         cpfVotacaoVerifier.verify(
                 votoRequest,
                 sessaoVotacaoCacheEntity,
-                ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura()
+                ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura(),
+                isAssociadoTentandoVotarNovamente
         );
     }
 }

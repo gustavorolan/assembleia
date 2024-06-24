@@ -1,15 +1,12 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
-import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.exception.SessaoCacheNotFoundException;
-import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoCacheRepository;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.factory.service.SessaoVotacaoFactory;
-import com.sicredi.assembleia.factory.service.VotoFactory;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -33,6 +30,9 @@ class SessaoVotacaoCacheServiceImplTest {
     @Captor
     private ArgumentCaptor<SessaoVotacaoCacheEntity> sessaoVotacaoCacheCaptor;
 
+    @Captor
+    private ArgumentCaptor<Long> idCaptor;
+
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(sessaoVotacaoCacheService, "sessaoCacheTtl", "86400");
@@ -44,7 +44,6 @@ class SessaoVotacaoCacheServiceImplTest {
 
         SessaoVotacaoEntity sessaoVotacaoEntity = SessaoVotacaoFactory.criarEntidade();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .total(0)
                 .build();
 
         Mockito.when(sessaoVotacaoCacheRepository.save(Mockito.any(SessaoVotacaoCacheEntity.class)))
@@ -64,7 +63,6 @@ class SessaoVotacaoCacheServiceImplTest {
     @DisplayName("Deve retornar uma sessão votação do cache corretamente.")
     void deveRetornarUmaSessaoDeVotacaoEmCacheCorretamente() {
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .total(0)
                 .build();
 
         Mockito.when(sessaoVotacaoCacheRepository.findById(sessaoVotacaoCacheEntity.getId()))
@@ -84,7 +82,6 @@ class SessaoVotacaoCacheServiceImplTest {
     @DisplayName("Deve lançar uma exceção ao tentar encotrar uma sessão votação do cache.")
     void deveLancarUmaExcecaoAoTentarEncotrarSessaoDeVotacaoEmCache() {
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .total(0)
                 .build();
 
         Mockito.when(sessaoVotacaoCacheRepository.findById(sessaoVotacaoCacheEntity.getId()))
@@ -100,62 +97,6 @@ class SessaoVotacaoCacheServiceImplTest {
         Mockito.verifyNoMoreInteractions(sessaoVotacaoCacheRepository);
     }
 
-    @Test
-    @DisplayName("Deve adicionar o voto à sessão cache, Com lista nula.")
-    void inserirVotoNaSessaoVotacaoEmCacheAssociadosNull() {
-        VotoRequest votoRequest = VotoFactory.criarRequest();
-
-        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .total(0)
-                .associadosCpfs(null)
-                .build();
-
-        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntityExpected = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .total(1)
-                .associadosCpfs(SetCpfFactory.create(votoRequest.getCpf()))
-                .build();
-
-        Mockito.when(sessaoVotacaoCacheRepository.findById(votoRequest.getSessaoId()))
-                        .thenReturn(Optional.of(sessaoVotacaoCacheEntity));
-
-        sessaoVotacaoCacheService.inserirVotoNaSessaoVotacaoEmCache(votoRequest);
-
-        Mockito.verify(sessaoVotacaoCacheRepository, Mockito.times(1)).findById(votoRequest.getSessaoId());
-        Mockito.verify(sessaoVotacaoCacheRepository, Mockito.times(1)).save(sessaoVotacaoCacheCaptor.capture());
-
-        Assertions.assertEquals(sessaoVotacaoCacheEntityExpected, sessaoVotacaoCacheCaptor.getValue());
-
-        Mockito.verifyNoMoreInteractions(sessaoVotacaoCacheRepository);
-    }
-
-    @Test
-    @DisplayName("Deve adicionar o voto à sessão cache, Com lista empty.")
-    void inserirVotoNaSessaoVotacaoEmCacheAssociadosEmpty() {
-        VotoRequest votoRequest = VotoFactory.criarRequest();
-
-        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .total(0)
-                .associadosCpfs(SetCpfFactory.create())
-                .build();
-
-        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntityExpected = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .total(1)
-                .associadosCpfs(SetCpfFactory.create(votoRequest.getCpf()))
-                .build();
-
-        Mockito.when(sessaoVotacaoCacheRepository.findById(votoRequest.getSessaoId()))
-                .thenReturn(Optional.of(sessaoVotacaoCacheEntity));
-
-        sessaoVotacaoCacheService.inserirVotoNaSessaoVotacaoEmCache(votoRequest);
-
-        Mockito.verify(sessaoVotacaoCacheRepository, Mockito.times(1)).findById(votoRequest.getSessaoId());
-        Mockito.verify(sessaoVotacaoCacheRepository, Mockito.times(1)).save(sessaoVotacaoCacheCaptor.capture());
-
-        Assertions.assertEquals(sessaoVotacaoCacheEntityExpected, sessaoVotacaoCacheCaptor.getValue());
-
-        Mockito.verifyNoMoreInteractions(sessaoVotacaoCacheRepository);
-    }
-
 
     @Test
     @DisplayName("Deve deletar corretamente uma entidade de cache.")
@@ -163,11 +104,11 @@ class SessaoVotacaoCacheServiceImplTest {
 
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
 
-        sessaoVotacaoCacheService.delete(sessaoVotacaoCacheEntity);
+        sessaoVotacaoCacheService.delete(sessaoVotacaoCacheEntity.getId());
 
-        Mockito.verify(sessaoVotacaoCacheRepository, Mockito.times(1)).delete(sessaoVotacaoCacheCaptor.capture());
+        Mockito.verify(sessaoVotacaoCacheRepository, Mockito.times(1)).deleteById(idCaptor.capture());
 
-        Assertions.assertEquals(sessaoVotacaoCacheEntity, sessaoVotacaoCacheCaptor.getValue());
+        Assertions.assertEquals(sessaoVotacaoCacheEntity.getId(), idCaptor.getValue());
 
         Mockito.verifyNoMoreInteractions(sessaoVotacaoCacheRepository);
     }
