@@ -67,4 +67,4 @@ Por ser opcional, essa verificação externa atrapalharia o fluxo de insert. Acr
 
 
 # URL deployment
-- [http://tryoutgustavorolan.us-east-1.elasticbeanstalk.com/swagger-ui/index.html#](http://sicredi-assembleia.us-east-1.elasticbeanstalk.com/swagger-ui/index.html#)
+- http://sicredi-assembleia.us-east-1.elasticbeanstalk.com/swagger-ui/index.html#
