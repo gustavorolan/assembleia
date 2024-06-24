@@ -57,9 +57,9 @@ public class VotoServiceImpl implements VotoService {
 
         verify(votoRequest, sessaoVotacaoCache, isAssociadoTentandoVotarNovamente);
 
-        votoProducer.send(votoRequest);
-
         messageSessaoVotacaoService.aumentarNumeroDeVotosEmUm(votoRequest.getSessaoId());
+
+        votoProducer.send(votoRequest);
 
         logger.info("Voto foi adicionado na fila para processamento sessaoVotacao: {}", votoRequest.getSessaoId());
     }
