@@ -2,10 +2,12 @@ package com.sicredi.assembleia.core.service.voto.impl;
 
 import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.*;
+import com.sicredi.assembleia.core.exception.SessaoCacheNotFoundException;
 import com.sicredi.assembleia.core.mapper.VotoMapper;
 import com.sicredi.assembleia.core.repository.VotoRepository;
 import com.sicredi.assembleia.core.service.associado.AssociadoService;
 import com.sicredi.assembleia.core.service.dateTime.ZonedDateTimeService;
+import com.sicredi.assembleia.core.service.sessao.MessageSessaoVotacaoService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
 import com.sicredi.assembleia.core.service.voto.VotacaoVerfier;
@@ -44,6 +46,8 @@ class VotoServiceImplTest {
 
     private final ZonedDateTimeService zonedDateTimeService = Mockito.mock(ZonedDateTimeService.class);
 
+    private final MessageSessaoVotacaoService messageSessaoVotacaoService = Mockito.mock(MessageSessaoVotacaoService.class);
+
     private final VotoService votoService = new VotoServiceImpl(
             votoRepository,
             sessaoVotacaoService,
@@ -52,7 +56,8 @@ class VotoServiceImplTest {
             sessaoVotacaoCacheService,
             votacaoVerfiers,
             votoProducer,
-            zonedDateTimeService
+            zonedDateTimeService,
+            messageSessaoVotacaoService
     );
 
     @Captor
@@ -60,7 +65,7 @@ class VotoServiceImplTest {
 
     @Test
     @DisplayName("Deve inserir voto request na fila e no cache")
-    void deveInserirVotoRequestNaFilaENoCache() {
+    void deveInserirVotoRequestNaFilaENoDb() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
 
@@ -71,8 +76,33 @@ class VotoServiceImplTest {
 
         Mockito.verify(votoProducer, Mockito.times(1)).send(votoRequest);
 
-        Mockito.verify(sessaoVotacaoCacheService, Mockito.times(1))
-                .inserirVotoNaSessaoVotacaoEmCache(votoRequest);
+        Mockito.verify(messageSessaoVotacaoService, Mockito.times(1))
+                .aumentarNumeroDeVotosEmUm(votoRequest.getSessaoId());
+
+        Mockito.verifyNoMoreInteractions(sessaoVotacaoService, votoProducer, messageSessaoVotacaoService);
+    }
+
+    @Test
+    @DisplayName("Deve inserir voto request na fila com resiliencia no db")
+    void deveInserirVotoRequestNaFilaComResilienciaNoDb() {
+        VotoRequest votoRequest = VotoFactory.criarRequest();
+        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
+
+        Mockito.when(sessaoVotacaoCacheService.findById(votoRequest.getSessaoId()))
+                .thenThrow(SessaoCacheNotFoundException.class);
+
+        Mockito.when(sessaoVotacaoService.inserirSessaoVotacaoCacheEntity(votoRequest.getSessaoId()))
+                .thenReturn(sessaoVotacaoCacheEntity);
+
+        votoService.votar(votoRequest);
+
+        Mockito.verify(votoProducer, Mockito.times(1)).send(votoRequest);
+        Mockito.verify(sessaoVotacaoService, Mockito.times(1))
+                .inserirSessaoVotacaoCacheEntity(votoRequest.getSessaoId());
+        Mockito.verify(messageSessaoVotacaoService, Mockito.times(1))
+                .aumentarNumeroDeVotosEmUm(votoRequest.getSessaoId());
+
+        Mockito.verifyNoMoreInteractions(sessaoVotacaoService, votoProducer, messageSessaoVotacaoService);
     }
 
     @Test

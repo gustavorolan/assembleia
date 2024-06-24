@@ -2,6 +2,7 @@ package com.sicredi.assembleia.core.service.sessao;
 
 import com.sicredi.assembleia.core.dto.AberturaSessaoVotacaoRequest;
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
+import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
 import org.springframework.data.domain.Page;
@@ -20,4 +21,6 @@ public interface SessaoVotacaoService {
     SessaoVotacaoEntity save(SessaoVotacaoEntity entity);
 
     Page<SessaoVotacaoResponse> findAllByStatus(int page, SessaoVotacaoEnum status);
+
+    SessaoVotacaoCacheEntity inserirSessaoVotacaoCacheEntity(Long sessaoId);
 }

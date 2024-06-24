@@ -3,6 +3,7 @@ package com.sicredi.assembleia.core.service.sessao.impl;
 import com.sicredi.assembleia.core.dto.AberturaSessaoVotacaoRequest;
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
 import com.sicredi.assembleia.core.entity.PautaEntity;
+import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
 import com.sicredi.assembleia.core.exception.PautaJaTemUmaSessaoVotacaoException;
@@ -231,6 +232,29 @@ class SessaoVotacaoServiceImplTest {
         Mockito.verify(sessaoVotacaoRepository, Mockito.times(1)).findAllByStatus(status, pageRequest);
 
         Assertions.assertEquals(sessoesVotacaoResponsesPage, responses);
+
+        Mockito.verifyNoMoreInteractions(sessaoVotacaoRepository);
+    }
+
+    @Test
+    @DisplayName("Deve obter cache a partir da sessão votação entity")
+    void inserirSessaoVotacaoCacheEntity() {
+        SessaoVotacaoEntity sessaoVotacaoEntity = SessaoVotacaoFactory.criarEntidade();
+        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
+
+        Mockito.when(sessaoVotacaoRepository.findById(sessaoVotacaoCacheEntity.getId()))
+                        .thenReturn(Optional.of(sessaoVotacaoEntity));
+        Mockito.when(sessaoVotacaoCacheService.inserirSessaoVotacaoEmCache(sessaoVotacaoEntity))
+                        .thenReturn(sessaoVotacaoCacheEntity);
+
+        SessaoVotacaoCacheEntity response = sessaoVotacaoService.inserirSessaoVotacaoCacheEntity(sessaoVotacaoEntity.getId());
+
+        Mockito.verify(sessaoVotacaoCacheService, Mockito.times(1))
+                .inserirSessaoVotacaoEmCache(sessaoVotacaoEntity);
+        Mockito.verify(sessaoVotacaoRepository, Mockito.times(1))
+                        .findById(sessaoVotacaoCacheEntity.getId());
+
+        Assertions.assertEquals(sessaoVotacaoCacheEntity, response);
 
         Mockito.verifyNoMoreInteractions(sessaoVotacaoRepository);
     }

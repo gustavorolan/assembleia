@@ -1,15 +1,12 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
-import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
+import com.sicredi.assembleia.core.entity.MessageSessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.service.dateTime.ZonedDateTimeService;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoEncerramentoProducer;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoEncerramentoService;
-import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
+import com.sicredi.assembleia.core.service.sessao.*;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
@@ -37,31 +34,37 @@ public class SessaoVotacaoEncerramentoServiceImpl implements SessaoVotacaoEncerr
 
     private final SessaoVotacaoEncerramentoProducer sessaoVotacaoEncerramentoProducer;
 
+    private final MessageSessaoVotacaoService messageSessaoVotacaoService;
+
     @Override
     @Scheduled(fixedRateString = "${spring.sessao_votacao.encerramento.tempo.ms}")
+    @Async
     public void encerrar() {
         logger.info("Iniciando processo de encerramento de sessões");
 
         List<SessaoVotacaoEntity> sessoes = sessaoVotacaoService.findAllStatusAberto();
 
-        sessoes.forEach(this::encerrar);
+        sessoes.forEach(sessao -> {
+            ZonedDateTime now = zonedDateTimeService.now();
+            boolean isHorarioEncerrado = now.isAfter(sessao.getHoraEncerramento());
+            if (isHorarioEncerrado) encerrar(sessao);
+        });
 
         logger.info("Terminando processo de encerramento de sessões");
     }
 
-    @Async
-    protected void encerrar(SessaoVotacaoEntity sessao) {
-        SessaoVotacaoCacheEntity sessaoCache = sessaoVotacaoCacheService.findById(sessao.getId());
 
-        ZonedDateTime now = zonedDateTimeService.now();
+    private void encerrar(SessaoVotacaoEntity sessao) {
 
-        boolean isTodasMensagensProcessadas = sessaoCache.getTotal() != null && sessaoCache.getTotal() >= sessao.getTotal();
-        boolean isHorarioEncerrado = now.isAfter(sessao.getHoraEncerramento());
+        MessageSessaoVotacaoEntity messageSessaoVotacaoEntity = messageSessaoVotacaoService
+                .findBySessaoId(sessao.getId());
 
-        if (isTodasMensagensProcessadas && isHorarioEncerrado) {
+        boolean isTodasMensagensProcessadas = messageSessaoVotacaoEntity.getTotal() >= sessao.getTotal();
+
+        if (isTodasMensagensProcessadas) {
             sessao.setStatus(SessaoVotacaoEnum.ENCERRADA);
             sessaoVotacaoService.save(sessao);
-            sessaoVotacaoCacheService.delete(sessaoCache);
+            sessaoVotacaoCacheService.delete(sessao.getId());
             logger.info("Sessao encerrada, id: {}", sessao.getId());
             SessaoVotacaoResponse sessaoVotacaoResponse = sessaoVotacaoMapper.sessaoEntityToResponse(sessao);
             sessaoVotacaoEncerramentoProducer.send(sessaoVotacaoResponse);

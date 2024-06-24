@@ -18,9 +18,14 @@ public class CpfVotacaoVerifier implements VotacaoVerfier {
     private static final String UNFORMATTED_CPF_REGEX = "^\\d{11}$";
 
     @Override
-    public void verify(VotoRequest votoRequest, SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity, ZonedDateTime now) {
+    public void verify(
+            VotoRequest votoRequest,
+            SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity,
+            ZonedDateTime now,
+            boolean isAssociadoTentandoVotarNovamente
+    ) {
         Pattern pattern = Pattern.compile(UNFORMATTED_CPF_REGEX);
         Matcher matcher = pattern.matcher(votoRequest.getCpf());
-        if(!matcher.matches()) throw new CpfInvalidoException();
+        if (!matcher.matches()) throw new CpfInvalidoException();
     }
 }
