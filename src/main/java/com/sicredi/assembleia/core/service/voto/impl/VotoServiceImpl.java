@@ -2,9 +2,11 @@ package com.sicredi.assembleia.core.service.voto.impl;
 
 import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.*;
+import com.sicredi.assembleia.core.exception.SessaoCacheNotFoundException;
 import com.sicredi.assembleia.core.repository.VotoRepository;
 import com.sicredi.assembleia.core.service.associado.AssociadoService;
 import com.sicredi.assembleia.core.service.dateTime.ZonedDateTimeService;
+import com.sicredi.assembleia.core.service.sessao.MessageSessaoVotacaoService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoService;
 import com.sicredi.assembleia.core.service.sessao.impl.SessaoVotacaoCacheServiceImpl;
@@ -42,16 +44,22 @@ public class VotoServiceImpl implements VotoService {
 
     private final ZonedDateTimeService zonedDateTimeService;
 
+    private final MessageSessaoVotacaoService messageSessaoVotacaoService;
+
     @Override
+    @Transactional
     public void votar(VotoRequest votoRequest) {
 
-        SessaoVotacaoCacheEntity sessaoVotacaoCache = sessaoVotacaoCacheService.findById(votoRequest.getSessaoId());
+        SessaoVotacaoCacheEntity sessaoVotacaoCache = obterSessaoVotacaoCache(votoRequest);
 
-        votacaoVerfiers.forEach(verifier -> verifier.verify(votoRequest, sessaoVotacaoCache, zonedDateTimeService.now()));
+        boolean isAssociadoTentandoVotarNovamente = votoRepository
+                .isAssociadoTentandoVotarNovamente(votoRequest.getSessaoId(), votoRequest.getCpf());
+
+        verify(votoRequest, sessaoVotacaoCache, isAssociadoTentandoVotarNovamente);
 
         votoProducer.send(votoRequest);
 
-        sessaoVotacaoCacheService.inserirVotoNaSessaoVotacaoEmCache(votoRequest);
+        messageSessaoVotacaoService.aumentarNumeroDeVotosEmUm(votoRequest.getSessaoId());
 
         logger.info("Voto foi adicionado na fila para processamento sessaoVotacao: {}", votoRequest.getSessaoId());
     }
@@ -83,6 +91,26 @@ public class VotoServiceImpl implements VotoService {
         if (votoRequest.getVoto() == VotoEnum.SIM)
             sessaoVotacaoEntity.setVotosFavor(sessaoVotacaoEntity.getVotosFavor() + 1);
         else sessaoVotacaoEntity.setVotosContra(sessaoVotacaoEntity.getVotosContra() + 1);
+    }
+
+
+    private void verify(VotoRequest votoRequest, SessaoVotacaoCacheEntity sessaoVotacaoCache, boolean isAssociadoTentandoVotarNovamente) {
+        votacaoVerfiers.forEach(verifier -> {
+            verifier.verify(
+                    votoRequest,
+                    sessaoVotacaoCache,
+                    zonedDateTimeService.now(),
+                    isAssociadoTentandoVotarNovamente
+            );
+        });
+    }
+
+    private SessaoVotacaoCacheEntity obterSessaoVotacaoCache(VotoRequest votoRequest) {
+        try {
+            return sessaoVotacaoCacheService.findById(votoRequest.getSessaoId());
+        } catch (SessaoCacheNotFoundException sessaoCacheNotFoundException) {
+            return sessaoVotacaoService.inserirSessaoVotacaoCacheEntity(votoRequest.getSessaoId());
+        }
     }
 
 }

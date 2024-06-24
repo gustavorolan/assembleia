@@ -2,7 +2,6 @@ package com.sicredi.assembleia.core.mapper;
 
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
 import com.sicredi.assembleia.core.entity.*;
-import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -43,11 +42,23 @@ public class SessaoVotacaoMapper {
         return SessaoVotacaoCacheEntity.builder()
                 .pautaId(entity.getPauta().getId())
                 .id(entity.getId())
-                .associadosCpfs(SetCpfFactory.create())
                 .horaAbertura(entity.getHoraAbertura())
-                .total(0)
                 .horaEncerramento(entity.getHoraEncerramento())
                 // Conversão para minutos
+                .ttl(ttl)
+                .build();
+    }
+
+    public MessageSessaoVotacaoEntity criarMessageSessaoVotacaoEntity(Long sessaoId) {
+        return MessageSessaoVotacaoEntity.builder().sessaoVotacaoId(sessaoId).total(0).build();
+    }
+
+    public SessaoVotacaoCacheEntity sessaoVotacaoCacheTosessaoVotacaoCacheEntity(SessaoVotacaoEntity sessaoVotacaoEntity, Long ttl){
+        return SessaoVotacaoCacheEntity.builder()
+                .horaAbertura(sessaoVotacaoEntity.getHoraAbertura())
+                .horaEncerramento(sessaoVotacaoEntity.getHoraEncerramento())
+                .pautaId(sessaoVotacaoEntity.getPauta().getId())
+                .id(sessaoVotacaoEntity.getId())
                 .ttl(ttl)
                 .build();
     }

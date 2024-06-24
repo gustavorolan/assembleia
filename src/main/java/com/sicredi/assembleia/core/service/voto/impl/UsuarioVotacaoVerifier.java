@@ -8,16 +8,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
 public class UsuarioVotacaoVerifier implements VotacaoVerfier {
 
     @Override
-    public void verify(VotoRequest votoRequest, SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity, ZonedDateTime now) {
-        Set<Long> associadosCpfs = sessaoVotacaoCacheEntity.getAssociadosCpfs();
-        if (associadosCpfs != null && associadosCpfs.contains(Long.parseLong(votoRequest.getCpf())))
+    public void verify(
+            VotoRequest votoRequest,
+            SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity,
+            ZonedDateTime now,
+            boolean isAssociadoTentandoVotarNovamente
+    ) {
+        if (isAssociadoTentandoVotarNovamente)
             throw new UsuarioVotacaoException();
     }
 }
