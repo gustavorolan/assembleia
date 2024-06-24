@@ -1,7 +1,6 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
-import com.sicredi.assembleia.core.entity.MessageSessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
@@ -51,15 +50,15 @@ class SessaoVotacaoEncerramentoServiceImplTest {
     @Test
     @DisplayName("Deve encerrar sessão corretamente.")
     void deveEncerrarSessaoCorretamente() {
-        MessageSessaoVotacaoEntity messageSessaoVotacaoEntity = SessaoVotacaoFactory.createMessageSessaoVotacaoEntity();
+        long totalMessageEsperado = 50L;
         SessaoVotacaoEntity sessaoVotacaoEntity = SessaoVotacaoFactory.criarEntidade();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
         ZonedDateTime zonedDateTime = ZonedDateTimeFactory.criarForaDoEncerramentoEAbertura();
 
         Mockito.when(sessaoVotacaoService.findAllStatusAberto()).thenReturn(List.of(sessaoVotacaoEntity));
         Mockito.when(zonedDateTimeService.now()).thenReturn(zonedDateTime);
-        Mockito.when(messageSessaoVotacaoService.findBySessaoId(sessaoVotacaoEntity.getId()))
-                .thenReturn(messageSessaoVotacaoEntity);
+        Mockito.when(messageSessaoVotacaoService.getTotalBySessaoId(sessaoVotacaoEntity.getId()))
+                .thenReturn(totalMessageEsperado);
 
         sessaoVotacaoEncerramentoService.encerrar();
 
@@ -70,7 +69,7 @@ class SessaoVotacaoEncerramentoServiceImplTest {
         Mockito.verify(sessaoVotacaoEncerramentoProducer, Mockito.times(1))
                 .send(Mockito.any(SessaoVotacaoResponse.class));
         Mockito.verify(messageSessaoVotacaoService, Mockito.times(1))
-                .findBySessaoId(sessaoVotacaoEntity.getId());
+                .getTotalBySessaoId(sessaoVotacaoEntity.getId());
 
         Assertions.assertEquals(SessaoVotacaoEnum.ENCERRADA, sessaoVotacaoCaptor.getValue().getStatus());
 
@@ -81,7 +80,6 @@ class SessaoVotacaoEncerramentoServiceImplTest {
     @DisplayName("Não Deve encerrar sessão.")
     void naoDeveEncerrarSessao() {
         SessaoVotacaoEntity sessaoVotacaoEntity = SessaoVotacaoFactory.criarEntidade();
-        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
         ZonedDateTime zonedDateTime = ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura();
 
         Mockito.when(sessaoVotacaoService.findAllStatusAberto()).thenReturn(List.of(sessaoVotacaoEntity));
@@ -95,7 +93,8 @@ class SessaoVotacaoEncerramentoServiceImplTest {
         Mockito.verify(sessaoVotacaoEncerramentoProducer, Mockito.times(0))
                 .send(Mockito.any(SessaoVotacaoResponse.class));
         Mockito.verify(messageSessaoVotacaoService, Mockito.times(0))
-                .findBySessaoId(Mockito.any(Long.class));
+                .getTotalBySessaoId(Mockito.any(Long.class));
+
 
         Mockito.verifyNoMoreInteractions(sessaoVotacaoService, zonedDateTimeService, sessaoVotacaoCacheService);
     }

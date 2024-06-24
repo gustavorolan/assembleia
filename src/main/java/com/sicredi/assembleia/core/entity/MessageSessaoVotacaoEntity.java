@@ -17,9 +17,6 @@ public class MessageSessaoVotacaoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private Long sessaoVotacaoId;
-
     @Column(nullable = false)
-    private Integer total = 0;
+    private Long sessaoVotacaoId;
 }

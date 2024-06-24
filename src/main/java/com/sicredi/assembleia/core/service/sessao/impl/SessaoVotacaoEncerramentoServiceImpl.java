@@ -1,7 +1,6 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
-import com.sicredi.assembleia.core.entity.MessageSessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
@@ -15,7 +14,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -44,7 +42,11 @@ public class SessaoVotacaoEncerramentoServiceImpl implements SessaoVotacaoEncerr
 
         List<SessaoVotacaoEntity> sessoes = sessaoVotacaoService.findAllStatusAberto();
 
-        sessoes.forEach(this::encerrar);
+        sessoes.forEach(sessao -> {
+                    if (zonedDateTimeService.now().isAfter(sessao.getHoraEncerramento()))
+                        encerrar(sessao);
+                }
+        );
 
         logger.info("Terminando processo de encerramento de sessões");
     }
@@ -53,15 +55,12 @@ public class SessaoVotacaoEncerramentoServiceImpl implements SessaoVotacaoEncerr
     @Async
     void encerrar(SessaoVotacaoEntity sessao) {
 
-        MessageSessaoVotacaoEntity messageSessaoVotacaoEntity = messageSessaoVotacaoService
-                .findBySessaoId(sessao.getId());
+        Long totalMessages = messageSessaoVotacaoService
+                .getTotalBySessaoId(sessao.getId());
 
-        ZonedDateTime now = zonedDateTimeService.now();
-        boolean isHorarioEncerrado = now.isAfter(sessao.getHoraEncerramento());
+        boolean isTodasMensagensProcessadas = totalMessages >= sessao.getTotal();
 
-        boolean isTodasMensagensProcessadas = messageSessaoVotacaoEntity.getTotal() <= sessao.getTotal();
-
-        if (isHorarioEncerrado && isTodasMensagensProcessadas) {
+        if (isTodasMensagensProcessadas) {
             sessao.setStatus(SessaoVotacaoEnum.ENCERRADA);
             sessaoVotacaoService.save(sessao);
             sessaoVotacaoCacheService.delete(sessao.getId());

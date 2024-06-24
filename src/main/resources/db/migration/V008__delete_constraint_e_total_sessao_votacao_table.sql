@@ -1,0 +1,5 @@
+ALTER TABLE public.message_sessao_votacao
+DROP CONSTRAINT message_sessao_votacao_sessao_votacao_id_key;
+
+ALTER TABLE public.message_sessao_votacao
+DROP COLUMN total;

@@ -1,7 +1,6 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
 import com.sicredi.assembleia.core.entity.MessageSessaoVotacaoEntity;
-import com.sicredi.assembleia.core.exception.MessageSessaoNotFoundException;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.repository.MessageSessaoVotacaoRepository;
 import com.sicredi.assembleia.core.service.sessao.MessageSessaoVotacaoService;
@@ -22,24 +21,16 @@ public class MessageSessaoVotacaoServiceImpl implements MessageSessaoVotacaoServ
 
     @Override
     public void aumentarNumeroDeVotosEmUm(Long sessaoId) {
-        MessageSessaoVotacaoEntity messageSessaoVotacaoEntity = messageSessaoVotacaoRepository.findBySessaoVotacaoId(sessaoId)
-                .orElse(sessaoVotacaoMapper.criarMessageSessaoVotacaoEntity(sessaoId));
 
-        messageSessaoVotacaoEntity.setTotal(messageSessaoVotacaoEntity.getTotal() + 1);
+        MessageSessaoVotacaoEntity messageSessaoVotacaoEntity = sessaoVotacaoMapper
+                .criarMessageSessaoVotacaoEntity(sessaoId);
 
         messageSessaoVotacaoRepository.save(messageSessaoVotacaoEntity);
     }
 
     @Override
-    public MessageSessaoVotacaoEntity findBySessaoId(Long sessaoId) {
+    public Long getTotalBySessaoId(Long sessaoId) {
 
-        MessageSessaoNotFoundException exception = new MessageSessaoNotFoundException();
-
-        return messageSessaoVotacaoRepository.findBySessaoVotacaoId(sessaoId)
-                .orElseThrow(() -> {
-                    logger.error(exception.getMessage(), exception);
-                    return exception;
-                }
-        );
+        return messageSessaoVotacaoRepository.getTotalBySessaoId(sessaoId);
     }
 }
