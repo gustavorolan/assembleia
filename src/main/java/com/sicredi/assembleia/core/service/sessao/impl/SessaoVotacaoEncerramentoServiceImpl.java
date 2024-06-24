@@ -44,24 +44,24 @@ public class SessaoVotacaoEncerramentoServiceImpl implements SessaoVotacaoEncerr
 
         List<SessaoVotacaoEntity> sessoes = sessaoVotacaoService.findAllStatusAberto();
 
-        sessoes.forEach(sessao -> {
-            ZonedDateTime now = zonedDateTimeService.now();
-            boolean isHorarioEncerrado = now.isAfter(sessao.getHoraEncerramento());
-            if (isHorarioEncerrado) encerrar(sessao);
-        });
+        sessoes.forEach(this::encerrar);
 
         logger.info("Terminando processo de encerramento de sessões");
     }
 
 
-    private void encerrar(SessaoVotacaoEntity sessao) {
+    @Async
+    void encerrar(SessaoVotacaoEntity sessao) {
 
         MessageSessaoVotacaoEntity messageSessaoVotacaoEntity = messageSessaoVotacaoService
                 .findBySessaoId(sessao.getId());
 
-        boolean isTodasMensagensProcessadas = messageSessaoVotacaoEntity.getTotal() >= sessao.getTotal();
+        ZonedDateTime now = zonedDateTimeService.now();
+        boolean isHorarioEncerrado = now.isAfter(sessao.getHoraEncerramento());
 
-        if (isTodasMensagensProcessadas) {
+        boolean isTodasMensagensProcessadas = messageSessaoVotacaoEntity.getTotal() <= sessao.getTotal();
+
+        if (isHorarioEncerrado && isTodasMensagensProcessadas) {
             sessao.setStatus(SessaoVotacaoEnum.ENCERRADA);
             sessaoVotacaoService.save(sessao);
             sessaoVotacaoCacheService.delete(sessao.getId());

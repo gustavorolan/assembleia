@@ -6,7 +6,7 @@ spring:
   sessao_votacao:
     encerramento:
       tempo:
-        ms: 60000
+        ms: 600
 
   rabbitmq:
     host: localhost
