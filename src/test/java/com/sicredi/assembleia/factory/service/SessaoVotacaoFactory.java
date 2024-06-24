@@ -75,7 +75,6 @@ public class SessaoVotacaoFactory {
     public static MessageSessaoVotacaoEntity.MessageSessaoVotacaoEntityBuilder messageSessaoVotacaoEnityBuilder() {
         return MessageSessaoVotacaoEntity.builder()
                 .sessaoVotacaoId(1L)
-                .id(1L)
-                .total(50);
+                .id(1L);
     }
 }

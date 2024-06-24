@@ -50,16 +50,6 @@ public class SessaoVotacaoMapper {
     }
 
     public MessageSessaoVotacaoEntity criarMessageSessaoVotacaoEntity(Long sessaoId) {
-        return MessageSessaoVotacaoEntity.builder().sessaoVotacaoId(sessaoId).total(0).build();
-    }
-
-    public SessaoVotacaoCacheEntity sessaoVotacaoCacheTosessaoVotacaoCacheEntity(SessaoVotacaoEntity sessaoVotacaoEntity, Long ttl){
-        return SessaoVotacaoCacheEntity.builder()
-                .horaAbertura(sessaoVotacaoEntity.getHoraAbertura())
-                .horaEncerramento(sessaoVotacaoEntity.getHoraEncerramento())
-                .pautaId(sessaoVotacaoEntity.getPauta().getId())
-                .id(sessaoVotacaoEntity.getId())
-                .ttl(ttl)
-                .build();
+        return MessageSessaoVotacaoEntity.builder().sessaoVotacaoId(sessaoId).build();
     }
 }

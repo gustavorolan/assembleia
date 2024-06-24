@@ -2,7 +2,6 @@ package com.sicredi.assembleia.core.service.sessao.impl;
 
 
 import com.sicredi.assembleia.core.entity.MessageSessaoVotacaoEntity;
-import com.sicredi.assembleia.core.exception.MessageSessaoNotFoundException;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
 import com.sicredi.assembleia.core.repository.MessageSessaoVotacaoRepository;
 import com.sicredi.assembleia.core.service.sessao.MessageSessaoVotacaoService;
@@ -15,8 +14,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class MessageSessaoVotacaoServiceImplTest {
@@ -34,15 +31,15 @@ class MessageSessaoVotacaoServiceImplTest {
     @DisplayName("Deve aumentar o número de votos em um corretamente")
     void deveAumentarNumeroDeVotosEmUmCorretamente() {
         MessageSessaoVotacaoEntity entity = SessaoVotacaoFactory.createMessageSessaoVotacaoEntity();
-        MessageSessaoVotacaoEntity entityEsperada = SessaoVotacaoFactory.messageSessaoVotacaoEnityBuilder().total(51).build();
+        MessageSessaoVotacaoEntity entityEsperada = SessaoVotacaoFactory.messageSessaoVotacaoEnityBuilder()
+                .id(null)
+                .build();
 
-        Mockito.when(messageSessaoVotacaoRepository.findBySessaoVotacaoId(entityEsperada.getSessaoVotacaoId())).thenReturn(Optional.of(entity));
         Mockito.when(messageSessaoVotacaoRepository.save(Mockito.any(MessageSessaoVotacaoEntity.class))).thenReturn(entityEsperada);
 
         messageSessaoVotacaoService.aumentarNumeroDeVotosEmUm(entity.getSessaoVotacaoId());
 
         Mockito.verify(messageSessaoVotacaoRepository, Mockito.times(1)).save(captor.capture());
-        Mockito.verify(messageSessaoVotacaoRepository, Mockito.times(1)).findBySessaoVotacaoId(entity.getSessaoVotacaoId());
 
         Assertions.assertEquals(entityEsperada, captor.getValue());
 
@@ -50,20 +47,18 @@ class MessageSessaoVotacaoServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve aumentar o número de votos em um corretamente e criar uma entidade nova")
+    @DisplayName("Deve aumentar o número de votos em um corretamente")
     void deveAumentarNumeroDeVotosEmUmCorretamenteECriarUmaEntidadeNova() {
 
-        MessageSessaoVotacaoEntity entityInicial = SessaoVotacaoFactory.messageSessaoVotacaoEnityBuilder().id(null).total(0).build();
+        MessageSessaoVotacaoEntity entityInicial = SessaoVotacaoFactory.messageSessaoVotacaoEnityBuilder().id(null).build();
 
-        MessageSessaoVotacaoEntity entityEsperada = SessaoVotacaoFactory.messageSessaoVotacaoEnityBuilder().id(null).total(1).build();
+        MessageSessaoVotacaoEntity entityEsperada = SessaoVotacaoFactory.messageSessaoVotacaoEnityBuilder().id(null).build();
 
-        Mockito.when(messageSessaoVotacaoRepository.findBySessaoVotacaoId(entityEsperada.getSessaoVotacaoId())).thenReturn(Optional.empty());
         Mockito.when(messageSessaoVotacaoRepository.save(Mockito.any(MessageSessaoVotacaoEntity.class))).thenReturn(entityInicial);
 
         messageSessaoVotacaoService.aumentarNumeroDeVotosEmUm(entityInicial.getSessaoVotacaoId());
 
         Mockito.verify(messageSessaoVotacaoRepository, Mockito.times(1)).save(captor.capture());
-        Mockito.verify(messageSessaoVotacaoRepository, Mockito.times(1)).findBySessaoVotacaoId(entityInicial.getSessaoVotacaoId());
 
         Assertions.assertEquals(entityEsperada, captor.getValue());
 
@@ -71,35 +66,20 @@ class MessageSessaoVotacaoServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve encontrar entidade pelo id")
-    void deveEncontrarEntidadePeloId() {
+    @DisplayName("Deve contar entidade pelo id")
+    void deveContaEntidadePeloId() {
+        Long sessaoId = 1L;
+        long totalEsperado = 50L;
 
-        MessageSessaoVotacaoEntity entityEsperada = SessaoVotacaoFactory.createMessageSessaoVotacaoEntity();
+        Mockito.when(messageSessaoVotacaoRepository.getTotalBySessaoId(sessaoId)).thenReturn(totalEsperado);
 
-        Mockito.when(messageSessaoVotacaoRepository.findBySessaoVotacaoId(entityEsperada.getSessaoVotacaoId())).thenReturn(Optional.of(entityEsperada));
+        Long response = messageSessaoVotacaoService.getTotalBySessaoId(sessaoId);
 
-        MessageSessaoVotacaoEntity response = messageSessaoVotacaoService.findBySessaoId(entityEsperada.getSessaoVotacaoId());
+        Mockito.verify(messageSessaoVotacaoRepository, Mockito.times(1)).getTotalBySessaoId(sessaoId);
 
-        Mockito.verify(messageSessaoVotacaoRepository, Mockito.times(1)).findBySessaoVotacaoId(entityEsperada.getSessaoVotacaoId());
-
-        Assertions.assertEquals(entityEsperada, response);
-
-        Mockito.verifyNoMoreInteractions(messageSessaoVotacaoRepository);
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao tentar encontrar entidade pelo id")
-    void deveLancarExcecaoAOtentarEncontrarEntidadePeloSessaoVotacaoId() {
-
-        MessageSessaoVotacaoEntity entityEsperada = SessaoVotacaoFactory.createMessageSessaoVotacaoEntity();
-
-        Mockito.when(messageSessaoVotacaoRepository.findBySessaoVotacaoId(entityEsperada.getSessaoVotacaoId())).thenReturn(Optional.empty());
-
-        Assertions.assertThrowsExactly(MessageSessaoNotFoundException.class, () ->
-                messageSessaoVotacaoService.findBySessaoId(entityEsperada.getSessaoVotacaoId()));
-
-        Mockito.verify(messageSessaoVotacaoRepository, Mockito.times(1)).findBySessaoVotacaoId(entityEsperada.getSessaoVotacaoId());
+        Assertions.assertEquals(totalEsperado, response);
 
         Mockito.verifyNoMoreInteractions(messageSessaoVotacaoRepository);
     }
+
 }
