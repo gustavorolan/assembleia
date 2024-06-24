@@ -11,6 +11,7 @@ import java.util.List;
 
 @Repository
 public interface SessaoVotacaoRepository extends JpaRepository<SessaoVotacaoEntity, Long> {
+
     List<SessaoVotacaoEntity> findAllByStatus(SessaoVotacaoEnum status);
 
     Page<SessaoVotacaoEntity>  findAllByStatus(SessaoVotacaoEnum status, Pageable pageable);

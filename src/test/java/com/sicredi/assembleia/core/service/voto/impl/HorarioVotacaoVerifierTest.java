@@ -24,12 +24,14 @@ class HorarioVotacaoVerifierTest {
     void deveLancarExcecaoPoisSessaoFoiEncerrada() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
+        boolean isAssociadoTentandoVotarNovamente = false;
 
         Assertions.assertThrowsExactly(SessaoVotacaoEncerradaException.class, () ->
                 horarioVotacaoVerifier.verify(
                         votoRequest,
                         sessaoVotacaoCacheEntity,
-                        ZonedDateTimeFactory.criarForaDoEncerramentoEAbertura()
+                        ZonedDateTimeFactory.criarForaDoEncerramentoEAbertura(),
+                        isAssociadoTentandoVotarNovamente
                 )
         );
     }
@@ -39,11 +41,13 @@ class HorarioVotacaoVerifierTest {
     void naoDeveLancarExcecaoPoisSessaoEstaAberta() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.criarEntidadeCache();
+        boolean isAssociadoTentandoVotarNovamente = false;
 
         horarioVotacaoVerifier.verify(
                 votoRequest,
                 sessaoVotacaoCacheEntity,
-                ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura()
+                ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura(),
+                isAssociadoTentandoVotarNovamente
         );
     }
 }

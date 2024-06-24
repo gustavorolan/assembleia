@@ -11,4 +11,4 @@ RUN mvn package -DskipTests
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "target/assembleia-1.0.0.jar"]
+CMD ["java", "-jar", "target/assembleia-1.1.2.jar"]

@@ -2,9 +2,7 @@ package com.sicredi.assembleia.core.service.sessao.impl;
 
 import com.sicredi.assembleia.core.dto.AberturaSessaoVotacaoRequest;
 import com.sicredi.assembleia.core.dto.SessaoVotacaoResponse;
-import com.sicredi.assembleia.core.entity.PautaEntity;
-import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
-import com.sicredi.assembleia.core.entity.SessaoVotacaoEnum;
+import com.sicredi.assembleia.core.entity.*;
 import com.sicredi.assembleia.core.exception.PautaJaTemUmaSessaoVotacaoException;
 import com.sicredi.assembleia.core.exception.SessaoNotFoundException;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoRepository;
@@ -109,6 +107,12 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
     public Page<SessaoVotacaoResponse> findAllByStatus(int page, SessaoVotacaoEnum status) {
         return sessaoVotacaoRepository.findAllByStatus(status, pageRequest(page))
                 .map(sessaoVotacaoMapper::sessaoEntityToResponse);
+    }
+
+    @Override
+    public SessaoVotacaoCacheEntity inserirSessaoVotacaoCacheEntity(Long sessaoId) {
+        SessaoVotacaoEntity sessaoVotacaoEntity = findById(sessaoId);
+        return sessaoVotacaoCacheService.inserirSessaoVotacaoEmCache(sessaoVotacaoEntity);
     }
 
     private PageRequest pageRequest(int page) {

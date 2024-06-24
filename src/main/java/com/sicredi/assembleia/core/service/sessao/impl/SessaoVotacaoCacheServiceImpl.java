@@ -1,10 +1,8 @@
 package com.sicredi.assembleia.core.service.sessao.impl;
 
-import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoEntity;
 import com.sicredi.assembleia.core.exception.SessaoCacheNotFoundException;
-import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import com.sicredi.assembleia.core.repository.SessaoVotacaoCacheRepository;
 import com.sicredi.assembleia.core.service.sessao.SessaoVotacaoCacheService;
 import com.sicredi.assembleia.core.mapper.SessaoVotacaoMapper;
@@ -13,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +27,11 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
 
 
     @Override
-    public void inserirSessaoVotacaoEmCache(SessaoVotacaoEntity sessaoVotacaoEntity) {
+    public SessaoVotacaoCacheEntity inserirSessaoVotacaoEmCache(SessaoVotacaoEntity sessaoVotacaoEntity) {
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = sessaoVotacaoMapper.criarNovaSessaoCache(sessaoVotacaoEntity, Long.parseLong(sessaoCacheTtl));
         sessaoVotacaoCacheRepository.save(sessaoVotacaoCacheEntity);
         logger.info("Sessão votação cache adicionado com sucesso!");
+        return sessaoVotacaoCacheEntity;
     }
 
 
@@ -49,30 +46,7 @@ public class SessaoVotacaoCacheServiceImpl implements SessaoVotacaoCacheService 
     }
 
     @Override
-    public void inserirVotoNaSessaoVotacaoEmCache(VotoRequest votoRequest) {
-        SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = findById(votoRequest.getSessaoId());
-
-        String cpf = votoRequest.getCpf();
-        Set<Long> associadosIds = sessaoVotacaoCacheEntity.getAssociadosCpfs();
-
-        if (associadosIds == null)
-            sessaoVotacaoCacheEntity.setAssociadosCpfs(SetCpfFactory.create(cpf));
-        else
-            sessaoVotacaoCacheEntity.getAssociadosCpfs().add(Long.parseLong(cpf));
-
-        atualizarNumeroTotalDevotos(sessaoVotacaoCacheEntity);
-
-        sessaoVotacaoCacheRepository.save(sessaoVotacaoCacheEntity);
-
-        logger.info("Voto adicionado à sessão votação cache com sucesso!");
-    }
-
-    @Override
-    public void delete(SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity){
-        sessaoVotacaoCacheRepository.delete(sessaoVotacaoCacheEntity);
-    }
-
-    private static void atualizarNumeroTotalDevotos(SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity) {
-        sessaoVotacaoCacheEntity.setTotal(sessaoVotacaoCacheEntity.getTotal() + 1);
+    public void delete(Long id){
+        sessaoVotacaoCacheRepository.deleteById(id);
     }
 }

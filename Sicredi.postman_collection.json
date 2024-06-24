@@ -1,0 +1,281 @@
+{
+	"info": {
+		"_postman_id": "d544edc6-4c19-41ef-a390-17ad7248ef6c",
+		"name": "Sicredi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22771809"
+	},
+	"item": [
+		{
+			"name": "Get",
+			"item": [
+				{
+					"name": "FindPautaById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"descricao\": \"descricao1\",\r\n    \"nome\": \"nome1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v0/pauta/{{pautaId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"pauta",
+								"{{pautaId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FindSessaoById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v0/sessao/{{sessaoId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"sessao",
+								"{{sessaoId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FindSessaoAllByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v0/sessao?status=ABERTA&page=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"sessao"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ABERTA"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "CriarPauta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();\r",
+									"pm.environment.set(\"pautaId\", responseJson.id);\r",
+									"\r",
+									"pm.environment.set(\"iterationCounter\", 0);\r",
+									"pm.environment.set(\"initialRequestsDone\", false);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"descricao\": \"descricao1\",\r\n    \"nome\": \"nome1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v0/pauta",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"pauta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AbrirSessao",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"iterationCounter\", 0);\r",
+									"pm.environment.set(\"initialRequestsDone\", false);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();\r",
+									"pm.environment.set(\"sessaoId\", responseJson.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"pautaId\": {{pautaId}},\r\n    \"duracaoMinutos\": 6\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v0/sessao",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"sessao"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VotarFavor",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomNumber = Math.floor(Math.random() * 99999999999) + 1;\r",
+									"const randomNumberString = randomNumber.toString().padStart(11, '0');\r",
+									"pm.environment.set(\"cpf\", randomNumberString);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"voto\": \"SIM\",\r\n    \"sessaoId\": {{sessaoId}},\r\n    \"cpf\": \"{{cpf}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v0/voto",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"voto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VotarContra",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomNumber = Math.floor(Math.random() * 99999999999) + 1;\r",
+									"const randomNumberString = randomNumber.toString().padStart(11, '0');\r",
+									"pm.environment.set(\"cpf\", randomNumberString);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"voto\": \"NAO\",\r\n    \"sessaoId\": {{sessaoId}},\r\n    \"cpf\": \"{{cpf}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v0/voto",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"voto"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

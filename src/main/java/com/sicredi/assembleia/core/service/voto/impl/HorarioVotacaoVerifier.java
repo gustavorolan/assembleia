@@ -14,7 +14,12 @@ import java.time.ZonedDateTime;
 public class HorarioVotacaoVerifier implements VotacaoVerfier {
 
     @Override
-    public void verify(VotoRequest votoRequest, SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity, ZonedDateTime now) {
+    public void verify(
+            VotoRequest votoRequest,
+            SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity,
+            ZonedDateTime now,
+            boolean isAssociadoTentandoVotarNovamente
+    ) {
         if (!now.isAfter(sessaoVotacaoCacheEntity.getHoraAbertura()) ||
                 !now.isBefore(sessaoVotacaoCacheEntity.getHoraEncerramento()))
             throw new SessaoVotacaoEncerradaException();

@@ -3,7 +3,6 @@ package com.sicredi.assembleia.core.service.voto.impl;
 import com.sicredi.assembleia.core.dto.VotoRequest;
 import com.sicredi.assembleia.core.entity.SessaoVotacaoCacheEntity;
 import com.sicredi.assembleia.core.exception.UsuarioVotacaoException;
-import com.sicredi.assembleia.core.factory.SetCpfFactory;
 import com.sicredi.assembleia.factory.service.SessaoVotacaoFactory;
 import com.sicredi.assembleia.factory.service.VotoFactory;
 import com.sicredi.assembleia.factory.service.ZonedDateTimeFactory;
@@ -25,14 +24,15 @@ class UsuarioVotacaoVerifierTest {
     void deveLancarExcecaoPoisUsarioJaVotou() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .associadosCpfs(SetCpfFactory.create(votoRequest.getCpf()))
                 .build();
+        boolean isAssociadoTentandoVotarNovamente = true;
 
         Assertions.assertThrowsExactly(UsuarioVotacaoException.class, () ->
                 usuarioVotacaoVerifier.verify(
                         votoRequest,
                         sessaoVotacaoCacheEntity,
-                        ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura()
+                        ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura(),
+                        isAssociadoTentandoVotarNovamente
                 )
         );
     }
@@ -42,13 +42,14 @@ class UsuarioVotacaoVerifierTest {
     void naoDeveLancarExcecaoPoisUsarioNaoVotou() {
         VotoRequest votoRequest = VotoFactory.criarRequest();
         SessaoVotacaoCacheEntity sessaoVotacaoCacheEntity = SessaoVotacaoFactory.entidadeCacheBuilder()
-                .associadosCpfs(SetCpfFactory.create())
                 .build();
+        boolean isAssociadoTentandoVotarNovamente = false;
 
         usuarioVotacaoVerifier.verify(
                 votoRequest,
                 sessaoVotacaoCacheEntity,
-                ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura()
+                ZonedDateTimeFactory.criarDataEntreEncerramentoEAbertura(),
+                isAssociadoTentandoVotarNovamente
         );
     }
 }
